@@ -1,0 +1,926 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cavii Admin Panel — Salon Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --rose:#c8295a;--rose-deep:#8b1a3d;--rose-light:#f9eaf0;--rose-mid:#f2c2d2;
+  --gold:#c9973e;--gold-light:#f8f0e0;
+  --dark:#0f0a0d;--dark2:#1c1118;--dark3:#261622;
+  --surface:#1e1118;--surface2:#261a21;--surface3:#301f29;
+  --text:#f5e8ed;--muted:#9a7080;--border:rgba(200,41,90,.15);
+  --success:#2daa6e;--warn:#d4832a;--danger:#e04040;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;font-family:'DM Sans',sans-serif;background:var(--dark);color:var(--text);overflow:hidden}
+
+/* LOGIN */
+#loginScreen{position:fixed;inset:0;background:linear-gradient(135deg,var(--dark) 0%,var(--dark3) 100%);display:flex;align-items:center;justify-content:center;z-index:500}
+#loginScreen.hide{display:none}
+.login-box{background:var(--surface);border:1px solid var(--border);border-radius:28px;padding:52px 44px;width:380px;text-align:center;animation:popIn .5s ease}
+@keyframes popIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.login-logo{font-family:'Playfair Display',serif;font-size:32px;color:var(--rose);margin-bottom:6px}
+.login-logo span{color:var(--gold)}
+.login-sub{font-size:13px;color:var(--muted);margin-bottom:36px;letter-spacing:.5px}
+.l-label{display:block;font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;text-align:left;margin-bottom:7px}
+.l-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:12px;padding:13px 16px;color:var(--text);font-size:14px;outline:none;transition:all .3s;margin-bottom:16px;font-family:'DM Sans',sans-serif}
+.l-input:focus{border-color:rgba(200,41,90,.5);box-shadow:0 0 0 3px rgba(200,41,90,.08)}
+.l-btn{width:100%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;border:none;padding:15px;border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.5px;transition:all .3s;margin-top:4px}
+.l-btn:hover{box-shadow:0 8px 30px rgba(200,41,90,.4);transform:translateY(-1px)}
+.l-err{color:#f07070;font-size:12px;margin-top:10px;display:none}
+
+/* LAYOUT */
+#app{display:flex;height:100vh;overflow:hidden}
+
+/* SIDEBAR */
+.sidebar{width:220px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.sidebar::-webkit-scrollbar{width:0}
+.sb-header{padding:24px 20px 20px;border-bottom:1px solid var(--border)}
+.sb-logo{font-family:'Playfair Display',serif;font-size:20px;color:var(--rose)}
+.sb-logo span{color:var(--gold)}
+.sb-tag{font-size:10px;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-top:4px}
+.sb-section{padding:8px 12px 4px;font-size:10px;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-top:8px}
+.nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;margin:2px 8px;border-radius:12px;cursor:pointer;transition:all .2s;font-size:13px;color:var(--muted);position:relative}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:linear-gradient(135deg,rgba(200,41,90,.2),rgba(139,26,61,.15));color:var(--rose);border:1px solid rgba(200,41,90,.2)}
+.nav-item .ni-icon{font-size:17px;width:20px;text-align:center}
+.nav-badge{position:absolute;right:12px;background:var(--rose);color:#fff;font-size:10px;padding:2px 7px;border-radius:10px;font-weight:500}
+.sb-footer{padding:16px;margin-top:auto;border-top:1px solid var(--border)}
+.sb-user{display:flex;align-items:center;gap:10px}
+.sb-avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0}
+.sb-name{font-size:13px;font-weight:500;color:var(--text)}
+.sb-role{font-size:10px;color:var(--muted)}
+
+/* MAIN */
+.main-area{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.topbar-title{font-size:18px;font-weight:500;color:var(--text)}
+.topbar-right{display:flex;align-items:center;gap:12px}
+.tb-btn{background:var(--surface2);border:1px solid var(--border);color:var(--muted);padding:8px 16px;border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif}
+.tb-btn:hover{border-color:rgba(200,41,90,.3);color:var(--text)}
+.tb-date{font-size:13px;color:var(--muted)}
+.content{flex:1;overflow-y:auto;padding:24px;background:var(--dark2)}
+.content::-webkit-scrollbar{width:4px}
+.content::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+
+/* PAGE */
+.page{display:none}
+.page.active{display:block}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:20px;position:relative;overflow:hidden;transition:all .3s}
+.stat-card::before{content:'';position:absolute;top:-30px;right:-30px;width:80px;height:80px;border-radius:50%;background:rgba(200,41,90,.06)}
+.stat-card:hover{border-color:rgba(200,41,90,.25);transform:translateY(-2px)}
+.sc-label{font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.sc-val{font-family:'Playfair Display',serif;font-size:30px;font-weight:700;color:var(--text)}
+.sc-change{font-size:12px;margin-top:6px}
+.sc-change.up{color:var(--success)}
+.sc-change.warn{color:var(--warn)}
+.sc-icon{position:absolute;top:18px;right:18px;font-size:24px;opacity:.4}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:16px;margin-bottom:18px;overflow:hidden}
+.card-head{padding:16px 20px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+.card-head h3{font-size:15px;font-weight:500;color:var(--text)}
+.card-body{padding:0}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:18px}
+
+/* TABLE */
+.data-table{width:100%;border-collapse:collapse}
+.data-table th{padding:10px 16px;font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;text-align:left;border-bottom:1px solid var(--border)}
+.data-table td{padding:12px 16px;font-size:13px;color:var(--text);border-bottom:1px solid rgba(200,41,90,.05);vertical-align:middle}
+.data-table tr:last-child td{border-bottom:none}
+.data-table tr:hover td{background:rgba(200,41,90,.03)}
+.status-pill{font-size:11px;padding:3px 10px;border-radius:20px;font-weight:500;letter-spacing:.3px}
+.pill-green{background:rgba(45,170,110,.15);color:#5ddd9a}
+.pill-amber{background:rgba(212,131,42,.15);color:#f0a050}
+.pill-red{background:rgba(224,64,64,.15);color:#f07070}
+.pill-gray{background:rgba(154,112,128,.12);color:var(--muted)}
+
+/* BUTTONS */
+.btn{padding:8px 18px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;border:none}
+.btn-primary{background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff}
+.btn-primary:hover{box-shadow:0 6px 20px rgba(200,41,90,.4)}
+.btn-outline{background:transparent;border:1px solid var(--border);color:var(--muted)}
+.btn-outline:hover{border-color:rgba(200,41,90,.4);color:var(--text)}
+.btn-danger{background:rgba(224,64,64,.1);color:#f07070;border:1px solid rgba(224,64,64,.2)}
+.btn-danger:hover{background:rgba(224,64,64,.2)}
+.btn-sm{padding:5px 12px;font-size:12px;border-radius:8px}
+.btn-success{background:rgba(45,170,110,.15);color:#5ddd9a;border:1px solid rgba(45,170,110,.25)}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(15,10,13,.85);z-index:400;align-items:center;justify-content:center;backdrop-filter:blur(8px)}
+.modal-overlay.open{display:flex}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:22px;padding:36px;width:500px;max-height:90vh;overflow-y:auto;animation:popIn .3s ease}
+.modal h3{font-family:'Playfair Display',serif;font-size:22px;color:var(--text);margin-bottom:24px}
+.m-group{margin-bottom:18px}
+.m-label{display:block;font-size:11px;color:var(--muted);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+.m-input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:12px 14px;color:var(--text);font-size:14px;outline:none;transition:all .3s;font-family:'DM Sans',sans-serif}
+.m-input:focus{border-color:rgba(200,41,90,.4);box-shadow:0 0 0 3px rgba(200,41,90,.07)}
+.m-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.modal-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:24px}
+
+/* SEARCH BAR */
+.search-bar{background:var(--surface2);border:1px solid var(--border);border-radius:10px;padding:9px 14px;color:var(--text);font-size:13px;outline:none;width:220px;font-family:'DM Sans',sans-serif;transition:all .3s}
+.search-bar:focus{border-color:rgba(200,41,90,.4);width:260px}
+
+/* STOCK BAR */
+.stock-bar-wrap{background:var(--surface2);border-radius:4px;height:6px;overflow:hidden;min-width:80px}
+.stock-bar{height:100%;border-radius:4px;transition:width .5s}
+
+/* SERVICE ICON GRID */
+.icon-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:8px}
+.icon-opt{width:40px;height:40px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all .2s}
+.icon-opt.sel{border-color:var(--rose);background:rgba(200,41,90,.1)}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;right:30px;background:var(--surface);border:1px solid rgba(45,170,110,.3);border-radius:14px;padding:14px 22px;font-size:14px;color:#5ddd9a;z-index:600;transform:translateY(20px);opacity:0;transition:all .4s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+.toast.err{border-color:rgba(224,64,64,.3);color:#f07070}
+
+/* CHART BARS (CSS only) */
+.chart-wrap{padding:16px 20px;display:flex;gap:12px;align-items:flex-end;height:160px}
+.chart-bar-col{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1}
+.chart-bar{width:100%;background:linear-gradient(to top,var(--rose-deep),var(--rose));border-radius:6px 6px 0 0;transition:height .6s ease;position:relative}
+.chart-bar:hover{filter:brightness(1.2)}
+.chart-label{font-size:11px;color:var(--muted);text-align:center}
+.chart-val{font-size:11px;color:var(--rose);font-weight:500}
+
+/* ACTIVITY FEED */
+.activity-item{display:flex;align-items:flex-start;gap:12px;padding:12px 16px;border-bottom:1px solid rgba(200,41,90,.06)}
+.activity-item:last-child{border-bottom:none}
+.act-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.act-text{font-size:13px;color:var(--text)}
+.act-time{font-size:11px;color:var(--muted);margin-top:2px}
+
+@media(max-width:768px){.sidebar{display:none}.stats-row{grid-template-columns:1fr 1fr}.row2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">Cavii<span>✦</span></div>
+    <div class="login-sub">Admin Panel — Secure Access</div>
+    <label class="l-label">Username</label>
+    <input type="text" class="l-input" id="lUser" placeholder="admin" value="admin">
+    <label class="l-label">Password</label>
+    <input type="password" class="l-input" id="lPass" placeholder="••••••••" value="cavii2026" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="l-btn" onclick="doLogin()">✦ Login to Admin Panel</button>
+    <div class="l-err" id="lErr">Galat username ya password</div>
+    <div style="margin-top:20px;font-size:12px;color:var(--muted)">Default: admin / cavii2026</div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app" style="display:none">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sb-header">
+      <div class="sb-logo">Cavii<span>✦</span></div>
+      <div class="sb-tag">Admin Dashboard</div>
+    </div>
+    <div class="sb-section">Main</div>
+    <div class="nav-item active" onclick="showPage('dashboard',this)"><span class="ni-icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('bookings',this)"><span class="ni-icon">📅</span> Bookings <span class="nav-badge" id="pendingBadge">0</span></div>
+    <div class="sb-section">Management</div>
+    <div class="nav-item" onclick="showPage('services',this)"><span class="ni-icon">✨</span> Services</div>
+    <div class="nav-item" onclick="showPage('customers',this)"><span class="ni-icon">👩</span> Customers</div>
+    <div class="nav-item" onclick="showPage('stock',this)"><span class="ni-icon">📦</span> Stock</div>
+    <div class="nav-item" onclick="showPage('staff',this)"><span class="ni-icon">👩‍💼</span> Staff</div>
+    <div class="sb-section">Finance</div>
+    <div class="nav-item" onclick="showPage('billing',this)"><span class="ni-icon">💳</span> Billing</div>
+    <div class="nav-item" onclick="showPage('reports',this)"><span class="ni-icon">📈</span> Reports</div>
+    <div class="sb-section">System</div>
+    <div class="nav-item" onclick="showPage('settings',this)"><span class="ni-icon">⚙</span> Settings</div>
+    <div class="nav-item" onclick="window.open('index.html','_blank')"><span class="ni-icon">🌐</span> View Website</div>
+    <div class="nav-item" onclick="doLogout()"><span class="ni-icon">🚪</span> Logout</div>
+    <div class="sb-footer">
+      <div class="sb-user">
+        <div class="sb-avatar">AD</div>
+        <div><div class="sb-name">Admin</div><div class="sb-role">Super Admin</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MAIN -->
+  <div class="main-area">
+    <div class="topbar">
+      <div class="topbar-title" id="pageTitle">Dashboard</div>
+      <div class="topbar-right">
+        <div class="tb-date" id="tbDate"></div>
+        <button class="tb-btn" onclick="showPage('bookings',null)">+ New Booking</button>
+      </div>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="pg-dashboard">
+        <div class="stats-row">
+          <div class="stat-card"><div class="sc-icon">📅</div><div class="sc-label">Aaj Ki Bookings</div><div class="sc-val" id="d-bookings">0</div><div class="sc-change up" id="d-pending">0 pending</div></div>
+          <div class="stat-card"><div class="sc-icon">💰</div><div class="sc-label">Is Hafte Ki Kamai</div><div class="sc-val" id="d-revenue">₨0</div><div class="sc-change up">+18% vs last week</div></div>
+          <div class="stat-card"><div class="sc-icon">👩</div><div class="sc-label">Total Customers</div><div class="sc-val" id="d-customers">0</div><div class="sc-change up">+8 is mahine</div></div>
+          <div class="stat-card"><div class="sc-icon">⚠️</div><div class="sc-label">Low Stock Items</div><div class="sc-val warn" id="d-stock">0</div><div class="sc-change warn">Reorder needed</div></div>
+        </div>
+        <div class="row2">
+          <div class="card">
+            <div class="card-head"><h3>📊 Weekly Revenue</h3><span style="font-size:12px;color:var(--muted)">Aaj tak</span></div>
+            <div class="chart-wrap" id="revenueChart"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>🔔 Latest Activity</h3></div>
+            <div id="activityFeed"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>📅 Aaj Ki Appointments</h3><a href="#" onclick="showPage('bookings',null)" style="font-size:13px;color:var(--rose);text-decoration:none">Sab dekhein →</a></div>
+          <div class="card-body"><table class="data-table" id="todayAppts"><thead><tr><th>#</th><th>Customer</th><th>Service</th><th>Waqt</th><th>Status</th><th>Action</th></tr></thead><tbody></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- BOOKINGS -->
+      <div class="page" id="pg-bookings">
+        <div class="card">
+          <div class="card-head">
+            <h3>📅 All Bookings</h3>
+            <div style="display:flex;gap:10px;align-items:center">
+              <input class="search-bar" placeholder="🔍 Search..." id="bookingSearch" oninput="renderBookings()">
+              <select class="search-bar" style="width:auto" id="bookingFilter" onchange="renderBookings()">
+                <option value="">All Status</option>
+                <option value="Pending">Pending</option>
+                <option value="Confirmed">Confirmed</option>
+                <option value="Done">Done</option>
+                <option value="Cancelled">Cancelled</option>
+              </select>
+              <button class="btn btn-primary" onclick="openBookingModal()">+ Add Booking</button>
+            </div>
+          </div>
+          <div class="card-body"><table class="data-table"><thead><tr><th>ID</th><th>Customer</th><th>Phone</th><th>Service</th><th>Tarikh</th><th>Waqt</th><th>Status</th><th>Actions</th></tr></thead><tbody id="bookingsBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- SERVICES -->
+      <div class="page" id="pg-services">
+        <div class="card">
+          <div class="card-head"><h3>✨ Services Management</h3><button class="btn btn-primary" onclick="openServiceModal()">+ Nayi Service Add</button></div>
+          <div class="card-body"><table class="data-table"><thead><tr><th>Icon</th><th>Service</th><th>Category</th><th>Price</th><th>Duration</th><th>Actions</th></tr></thead><tbody id="servicesBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- CUSTOMERS -->
+      <div class="page" id="pg-customers">
+        <div class="card">
+          <div class="card-head"><h3>👩 Customers</h3>
+            <div style="display:flex;gap:10px"><input class="search-bar" placeholder="🔍 Search customer..." id="custSearch" oninput="renderCustomers()"><button class="btn btn-primary" onclick="openCustomerModal()">+ Add Customer</button></div>
+          </div>
+          <div class="card-body"><table class="data-table"><thead><tr><th>Naam</th><th>Phone</th><th>Skin Type</th><th>Visits</th><th>Last Service</th><th>Status</th><th>Actions</th></tr></thead><tbody id="customersBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- STOCK -->
+      <div class="page" id="pg-stock">
+        <div class="card">
+          <div class="card-head"><h3>📦 Stock Management</h3><button class="btn btn-primary" onclick="openStockModal()">+ Add Product</button></div>
+          <div class="card-body"><table class="data-table"><thead><tr><th>Product</th><th>Category</th><th>Qty</th><th>Min Level</th><th>Stock Level</th><th>Status</th><th>Actions</th></tr></thead><tbody id="stockBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- STAFF -->
+      <div class="page" id="pg-staff">
+        <div class="card">
+          <div class="card-head"><h3>👩‍💼 Staff Management</h3><button class="btn btn-primary" onclick="openStaffModal()">+ Add Staff</button></div>
+          <div class="card-body"><table class="data-table"><thead><tr><th>Naam</th><th>Role</th><th>Speciality</th><th>Schedule</th><th>Salary</th><th>Actions</th></tr></thead><tbody id="staffBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- BILLING -->
+      <div class="page" id="pg-billing">
+        <div class="stats-row" style="grid-template-columns:repeat(3,1fr)">
+          <div class="stat-card"><div class="sc-icon">💰</div><div class="sc-label">Aaj Ki Kamai</div><div class="sc-val" id="b-today">₨0</div></div>
+          <div class="stat-card"><div class="sc-icon">📅</div><div class="sc-label">Is Mahine</div><div class="sc-val" id="b-month">₨0</div></div>
+          <div class="stat-card"><div class="sc-icon">📊</div><div class="sc-label">Total Transactions</div><div class="sc-val" id="b-count">0</div></div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>💳 Transactions</h3><button class="btn btn-primary" onclick="openBillModal()">+ New Bill</button></div>
+          <div class="card-body"><table class="data-table"><thead><tr><th>Bill #</th><th>Customer</th><th>Service</th><th>Amount</th><th>Payment</th><th>Tarikh</th><th>Actions</th></tr></thead><tbody id="billsBody"></tbody></table></div>
+        </div>
+      </div>
+
+      <!-- REPORTS -->
+      <div class="page" id="pg-reports">
+        <div class="stats-row">
+          <div class="stat-card"><div class="sc-icon">📈</div><div class="sc-label">Is Mahine Revenue</div><div class="sc-val" id="r-rev">₨0</div><div class="sc-change up">Monthly</div></div>
+          <div class="stat-card"><div class="sc-icon">✂</div><div class="sc-label">Total Appointments</div><div class="sc-val" id="r-appts">0</div></div>
+          <div class="stat-card"><div class="sc-icon">⭐</div><div class="sc-label">Top Service</div><div class="sc-val" style="font-size:16px" id="r-top">—</div></div>
+          <div class="stat-card"><div class="sc-icon">👩</div><div class="sc-label">New Customers</div><div class="sc-val" id="r-new">0</div></div>
+        </div>
+        <div class="row2">
+          <div class="card">
+            <div class="card-head"><h3>Top Services by Revenue</h3></div>
+            <div style="padding:16px 20px" id="topServicesChart"></div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>Payment Methods</h3></div>
+            <div style="padding:16px 20px" id="paymentChart"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="pg-settings">
+        <div class="row2">
+          <div class="card">
+            <div class="card-head"><h3>⚙ Salon Settings</h3></div>
+            <div style="padding:20px">
+              <div class="m-group"><label class="m-label">Salon Ka Naam</label><input class="m-input" id="s-name" value="Cavii Salon &amp; Parlor"></div>
+              <div class="m-group"><label class="m-label">Address</label><input class="m-input" id="s-addr" value="Faisalabad, Punjab"></div>
+              <div class="m-group"><label class="m-label">Phone / WhatsApp</label><input class="m-input" id="s-phone" value="0300-CAVII"></div>
+              <div class="m-group"><label class="m-label">Opening Time</label><input class="m-input" type="time" id="s-open" value="10:00"></div>
+              <div class="m-group"><label class="m-label">Closing Time</label><input class="m-input" type="time" id="s-close" value="20:00"></div>
+              <button class="btn btn-primary" onclick="saveSettings()">💾 Settings Save Karein</button>
+            </div>
+          </div>
+          <div class="card">
+            <div class="card-head"><h3>🔐 Password Change</h3></div>
+            <div style="padding:20px">
+              <div class="m-group"><label class="m-label">Purana Password</label><input class="m-input" type="password" id="s-oldp" placeholder="••••••"></div>
+              <div class="m-group"><label class="m-label">Naya Password</label><input class="m-input" type="password" id="s-newp" placeholder="••••••"></div>
+              <div class="m-group"><label class="m-label">Confirm Password</label><input class="m-input" type="password" id="s-conp" placeholder="••••••"></div>
+              <button class="btn btn-primary" onclick="changePass()">🔐 Password Update Karein</button>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-head"><h3>🗑 Data Management</h3></div>
+          <div style="padding:20px;display:flex;gap:12px;flex-wrap:wrap">
+            <button class="btn btn-danger" onclick="if(confirm('Sab bookings delete hon gi!')){ localStorage.removeItem('caviiBookings'); toast('Bookings cleared','err'); renderDashboard(); }">Clear All Bookings</button>
+            <button class="btn btn-danger" onclick="if(confirm('Sab data delete hoga!'))resetAll()">Reset All Data</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<!-- Booking Modal -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <h3>✦ Appointment Add Karein</h3>
+    <div class="m-group"><label class="m-label">Customer Naam</label><input class="m-input" id="mb-name" placeholder="Sara Ahmed"></div>
+    <div class="m-group"><label class="m-label">Phone</label><input class="m-input" id="mb-phone" placeholder="0300-1234567"></div>
+    <div class="m-group"><label class="m-label">Service</label><select class="m-input" id="mb-svc"></select></div>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Tarikh</label><input class="m-input" type="date" id="mb-date"></div>
+      <div class="m-group"><label class="m-label">Waqt</label><select class="m-input" id="mb-time"><option>10:00 AM</option><option>11:00 AM</option><option>12:00 PM</option><option>01:00 PM</option><option>02:00 PM</option><option>03:00 PM</option><option>04:00 PM</option><option>05:00 PM</option><option>06:00 PM</option></select></div>
+    </div>
+    <div class="m-group"><label class="m-label">Staff</label><select class="m-input" id="mb-staff"><option>Aisha</option><option>Sana</option><option>Nadia</option><option>Rubina</option></select></div>
+    <div class="m-group"><label class="m-label">Notes</label><input class="m-input" id="mb-note" placeholder="Optional..."></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('bookingModal')">Cancel</button><button class="btn btn-primary" onclick="saveBooking()">✓ Save Booking</button></div>
+  </div>
+</div>
+
+<!-- Service Modal -->
+<div class="modal-overlay" id="serviceModal">
+  <div class="modal">
+    <h3 id="svcModalTitle">✦ Nayi Service Add Karein</h3>
+    <input type="hidden" id="ms-id">
+    <div class="m-group"><label class="m-label">Service Icon Chunein</label>
+      <div class="icon-grid" id="iconGrid"></div>
+      <input class="m-input" id="ms-icon" placeholder="Ya emoji likhein..." style="margin-top:8px">
+    </div>
+    <div class="m-group"><label class="m-label">Service Naam</label><input class="m-input" id="ms-name" placeholder="Keratin Treatment"></div>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Category</label>
+        <select class="m-input" id="ms-cat">
+          <option>Hair Treatment</option><option>Skin Treatment</option><option>Makeup</option><option>Laser & Wax</option><option>Facial</option><option>Other</option>
+        </select>
+      </div>
+      <div class="m-group"><label class="m-label">Duration</label><input class="m-input" id="ms-dur" placeholder="1h 30m"></div>
+    </div>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Price (₨)</label><input class="m-input" type="number" id="ms-price" placeholder="5000"></div>
+      <div class="m-group"><label class="m-label">Discount %</label><input class="m-input" type="number" id="ms-disc" placeholder="0"></div>
+    </div>
+    <div class="m-group"><label class="m-label">Description</label><input class="m-input" id="ms-desc" placeholder="Short description..."></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('serviceModal')">Cancel</button><button class="btn btn-primary" onclick="saveService()">✓ Save Service</button></div>
+  </div>
+</div>
+
+<!-- Stock Modal -->
+<div class="modal-overlay" id="stockModal">
+  <div class="modal">
+    <h3 id="stModalTitle">✦ Product Add Karein</h3>
+    <input type="hidden" id="mst-id">
+    <div class="m-group"><label class="m-label">Product Naam</label><input class="m-input" id="mst-name" placeholder="Keratin Solution"></div>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Category</label><select class="m-input" id="mst-cat"><option>Hair Products</option><option>Skin Care</option><option>Equipment</option><option>Consumables</option><option>Other</option></select></div>
+      <div class="m-group"><label class="m-label">Unit</label><select class="m-input" id="mst-unit"><option>Bottles</option><option>Boxes</option><option>Pieces</option><option>KG</option><option>Liters</option></select></div>
+    </div>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Current Qty</label><input class="m-input" type="number" id="mst-qty" placeholder="10"></div>
+      <div class="m-group"><label class="m-label">Min Level (Alert)</label><input class="m-input" type="number" id="mst-min" placeholder="3"></div>
+    </div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('stockModal')">Cancel</button><button class="btn btn-primary" onclick="saveStock()">✓ Save Product</button></div>
+  </div>
+</div>
+
+<!-- Customer Modal -->
+<div class="modal-overlay" id="customerModal">
+  <div class="modal">
+    <h3>✦ Customer Add Karein</h3>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Naam</label><input class="m-input" id="mc-name" placeholder="Sara Ahmed"></div>
+      <div class="m-group"><label class="m-label">Phone</label><input class="m-input" id="mc-phone" placeholder="0300-..."></div>
+    </div>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Skin Type</label><select class="m-input" id="mc-skin"><option>Normal</option><option>Oily</option><option>Dry</option><option>Combination</option><option>Sensitive</option></select></div>
+      <div class="m-group"><label class="m-label">Status</label><select class="m-input" id="mc-status"><option>Regular</option><option>VIP</option><option>New</option></select></div>
+    </div>
+    <div class="m-group"><label class="m-label">Allergies / Notes</label><input class="m-input" id="mc-note" placeholder="Latex allergy, etc..."></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('customerModal')">Cancel</button><button class="btn btn-primary" onclick="saveCustomer()">✓ Save Customer</button></div>
+  </div>
+</div>
+
+<!-- Staff Modal -->
+<div class="modal-overlay" id="staffModal">
+  <div class="modal">
+    <h3>✦ Staff Member Add Karein</h3>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Naam</label><input class="m-input" id="mst2-name" placeholder="Aisha Khan"></div>
+      <div class="m-group"><label class="m-label">Role</label><select class="m-input" id="mst2-role"><option>Senior Beautician</option><option>Hair Specialist</option><option>Skin Expert</option><option>Laser Technician</option><option>Makeup Artist</option><option>Receptionist</option></select></div>
+    </div>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Speciality</label><input class="m-input" id="mst2-spec" placeholder="Keratin, PRP"></div>
+      <div class="m-group"><label class="m-label">Salary (₨)</label><input class="m-input" type="number" id="mst2-sal" placeholder="25000"></div>
+    </div>
+    <div class="m-group"><label class="m-label">Schedule</label><input class="m-input" id="mst2-sch" placeholder="Mon-Sat 10AM-7PM"></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('staffModal')">Cancel</button><button class="btn btn-primary" onclick="saveStaff()">✓ Save Staff</button></div>
+  </div>
+</div>
+
+<!-- Bill Modal -->
+<div class="modal-overlay" id="billModal">
+  <div class="modal">
+    <h3>✦ New Bill Banayein</h3>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Customer</label><input class="m-input" id="mbl-cust" placeholder="Customer naam"></div>
+      <div class="m-group"><label class="m-label">Service</label><select class="m-input" id="mbl-svc"></select></div>
+    </div>
+    <div class="m-row">
+      <div class="m-group"><label class="m-label">Amount (₨)</label><input class="m-input" type="number" id="mbl-amt" placeholder="5000"></div>
+      <div class="m-group"><label class="m-label">Discount (₨)</label><input class="m-input" type="number" id="mbl-disc" placeholder="0"></div>
+    </div>
+    <div class="m-group"><label class="m-label">Payment Method</label><select class="m-input" id="mbl-pay"><option>Cash</option><option>Card</option><option>JazzCash</option><option>EasyPaisa</option><option>Bank Transfer</option></select></div>
+    <div class="modal-actions"><button class="btn btn-outline" onclick="closeModal('billModal')">Cancel</button><button class="btn btn-primary" onclick="saveBill()">✓ Bill Save Karein</button></div>
+  </div>
+</div>
+
+<div class="toast" id="toastEl"></div>
+
+<script>
+// ======== DATA DEFAULTS ========
+const DEF_SERVICES=[
+  {id:1,icon:'💆',cat:'Hair Treatment',name:'Keratin Treatment',desc:'Smooth, frizz-free silky hair.',price:8000,dur:'2h',disc:0},
+  {id:2,icon:'🌊',cat:'Hair Treatment',name:'Hair Spa',desc:'Deep nourishment & scalp healing.',price:4500,dur:'1h 30m',disc:0},
+  {id:3,icon:'💉',cat:'Hair Treatment',name:'Hair PRP',desc:'Platelet-rich plasma for hair growth.',price:12000,dur:'1h 30m',disc:0},
+  {id:4,icon:'✨',cat:'Skin Treatment',name:'Hydra Facial',desc:'Deep hydration & brightening.',price:5500,dur:'1h',disc:0},
+  {id:5,icon:'🔬',cat:'Skin Treatment',name:'Skin PRP',desc:'Anti-aging rejuvenation therapy.',price:15000,dur:'1h',disc:0},
+  {id:6,icon:'🪡',cat:'Skin Treatment',name:'Microneedling',desc:'Collagen induction therapy.',price:7000,dur:'1h',disc:0},
+  {id:7,icon:'💊',cat:'Skin Treatment',name:'Whitening Injection',desc:'Glutathione brightening treatment.',price:10000,dur:'45m',disc:0},
+  {id:8,icon:'⚡',cat:'Laser & Wax',name:'Laser Hair Removal',desc:'Permanent hair removal.',price:9000,dur:'45m',disc:0},
+  {id:9,icon:'🕯️',cat:'Laser & Wax',name:'Full Body Waxing',desc:'Smooth skin with premium wax.',price:3500,dur:'1h',disc:0},
+  {id:10,icon:'💄',cat:'Makeup',name:'Bridal Makeup',desc:'Complete HD bridal look.',price:25000,dur:'3h',disc:0},
+  {id:11,icon:'🌟',cat:'Makeup',name:'Party Makeup',desc:'Glamorous party-ready look.',price:6000,dur:'1h 30m',disc:0},
+  {id:12,icon:'🧖',cat:'Facial',name:'Glow Facial',desc:'Vitamin C & gold brightening.',price:3500,dur:'1h',disc:0},
+];
+const DEF_STOCK=[
+  {id:1,name:'Keratin Solution',cat:'Hair Products',qty:2,min:5,unit:'Bottles'},
+  {id:2,name:'PRP Needles',cat:'Consumables',qty:1,min:3,unit:'Boxes'},
+  {id:3,name:'Whitening Serum',cat:'Skin Care',qty:0,min:2,unit:'Pieces'},
+  {id:4,name:'Hair Color (Black)',cat:'Hair Products',qty:18,min:5,unit:'Pieces'},
+  {id:5,name:'Wax (Warm)',cat:'Consumables',qty:8,min:2,unit:'KG'},
+  {id:6,name:'Disposable Gloves',cat:'Consumables',qty:3,min:2,unit:'Boxes'},
+  {id:7,name:'Facial Cream',cat:'Skin Care',qty:12,min:3,unit:'Pieces'},
+];
+const DEF_CUSTOMERS=[
+  {id:1,name:'Sara Ahmed',phone:'0300-1111111',skin:'Oily',visits:8,last:'Keratin Treatment',status:'VIP',note:'No heat damage'},
+  {id:2,name:'Fatima Qadir',phone:'0321-2222222',skin:'Dry',visits:5,last:'Hydra Facial',status:'Regular',note:''},
+  {id:3,name:'Zara Malik',phone:'0333-3333333',skin:'Combination',visits:12,last:'Hair Spa',status:'VIP',note:'Latex allergy'},
+];
+const DEF_STAFF=[
+  {id:1,name:'Aisha Khan',role:'Senior Beautician',spec:'Keratin, Hair Spa',schedule:'Mon-Sat 10AM-7PM',salary:35000},
+  {id:2,name:'Sana Mir',role:'Skin Expert',spec:'Facial, PRP, Microneedling',schedule:'Mon-Sat 10AM-7PM',salary:40000},
+  {id:3,name:'Nadia Baig',role:'Laser Technician',spec:'Laser, Waxing',schedule:'Tue-Sun 11AM-8PM',salary:38000},
+  {id:4,name:'Rubina Ali',role:'Makeup Artist',spec:'Bridal, Party Makeup',schedule:'Mon-Sat 10AM-7PM',salary:30000},
+];
+
+function gs(k,d){return JSON.parse(localStorage.getItem(k)||'null')||d}
+function ss(k,v){localStorage.setItem(k,JSON.stringify(v))}
+function getData(){
+  return{
+    services:gs('caviiServices',DEF_SERVICES),
+    bookings:gs('caviiBookings',[]),
+    customers:gs('caviiCustomers',DEF_CUSTOMERS),
+    stock:gs('caviiStock',DEF_STOCK),
+    staff:gs('caviiStaff',DEF_STAFF),
+    bills:gs('caviiBills',[]),
+  };
+}
+function icons(){return['💆','🌊','💉','✨','🔬','🪡','💊','⚡','🕯️','💄','🌟','🧖','💅','🌺','🦋','💫','🌸','👑','🌙','💎','🎀','🪷','🌹','🫧']}
+
+// ======== AUTH ========
+let creds=gs('caviiCreds',{user:'admin',pass:'cavii2026'});
+function doLogin(){
+  const u=document.getElementById('lUser').value;
+  const p=document.getElementById('lPass').value;
+  if(u===creds.user&&p===creds.pass){
+    document.getElementById('loginScreen').classList.add('hide');
+    document.getElementById('app').style.display='flex';
+    initApp();
+  } else {
+    document.getElementById('lErr').style.display='block';
+  }
+}
+function doLogout(){document.getElementById('app').style.display='none';document.getElementById('loginScreen').classList.remove('hide')}
+function changePass(){
+  const o=document.getElementById('s-oldp').value,n=document.getElementById('s-newp').value,c=document.getElementById('s-conp').value;
+  if(o!==creds.pass){toast('Purana password galat hai','err');return}
+  if(n!==c){toast('Naya password match nahi karta','err');return}
+  if(n.length<6){toast('Password 6+ characters hona chahiye','err');return}
+  creds.pass=n;ss('caviiCreds',creds);toast('Password update ho gaya!');
+}
+
+// ======== TOAST ========
+function toast(msg,type=''){
+  const t=document.getElementById('toastEl');
+  t.textContent=msg;t.className='toast show'+(type?' '+type:'');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+// ======== NAV ========
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('pg-'+id).classList.add('active');
+  if(el)el.classList.add('active');
+  else{const nis=document.querySelectorAll('.nav-item');nis.forEach(n=>{if(n.textContent.toLowerCase().includes(id.substring(0,4)))n.classList.add('active')})}
+  const titles={dashboard:'Dashboard',bookings:'Bookings',services:'Services Management',customers:'Customers',stock:'Stock Management',staff:'Staff Management',billing:'Billing',reports:'Reports',settings:'Settings'};
+  document.getElementById('pageTitle').textContent=titles[id]||id;
+  if(id==='dashboard')renderDashboard();
+  if(id==='bookings')renderBookings();
+  if(id==='services')renderServices();
+  if(id==='customers')renderCustomers();
+  if(id==='stock')renderStock();
+  if(id==='staff')renderStaff();
+  if(id==='billing')renderBilling();
+  if(id==='reports')renderReports();
+}
+
+// ======== DASHBOARD ========
+function renderDashboard(){
+  const{bookings,customers,stock}=getData();
+  const today=new Date().toISOString().split('T')[0];
+  const todayB=bookings.filter(b=>b.date===today);
+  const pending=bookings.filter(b=>b.status==='Pending').length;
+  const lowStock=stock.filter(s=>s.qty<=s.min).length;
+  document.getElementById('d-bookings').textContent=todayB.length;
+  document.getElementById('d-pending').textContent=pending+' pending';
+  document.getElementById('d-customers').textContent=customers.length;
+  document.getElementById('d-stock').textContent=lowStock;
+  document.getElementById('pendingBadge').textContent=pending;
+
+  // Fake revenue
+  const rev=bookings.filter(b=>b.status==='Done').length*7200;
+  document.getElementById('d-revenue').textContent='₨'+rev.toLocaleString();
+
+  // Chart
+  const days=['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const vals=[45000,62000,38000,71000,55000,89000,47000];
+  const maxV=Math.max(...vals);
+  document.getElementById('revenueChart').innerHTML=days.map((d,i)=>`
+    <div class="chart-bar-col">
+      <div class="chart-val">₨${(vals[i]/1000).toFixed(0)}k</div>
+      <div class="chart-bar" style="height:${(vals[i]/maxV)*90}px" title="${d}: ₨${vals[i].toLocaleString()}"></div>
+      <div class="chart-label">${d}</div>
+    </div>`).join('');
+
+  // Today appointments table
+  const tb=document.querySelector('#todayAppts tbody');
+  tb.innerHTML=todayB.length?todayB.map(b=>`<tr>
+    <td><span style="font-size:11px;color:var(--muted)">${b.id}</span></td>
+    <td><strong>${b.name}</strong></td>
+    <td>${b.service}</td>
+    <td>${b.time}</td>
+    <td><span class="status-pill ${b.status==='Done'?'pill-green':b.status==='Confirmed'?'pill-amber':b.status==='Cancelled'?'pill-red':'pill-gray'}">${b.status}</span></td>
+    <td><div style="display:flex;gap:6px">
+      <button class="btn btn-sm btn-success" onclick="updateStatus('${b.id}','Done')">✓ Done</button>
+      <button class="btn btn-sm btn-outline" onclick="updateStatus('${b.id}','Confirmed')">Confirm</button>
+    </div></td>
+  </tr>`).join(''):`<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Aaj koi appointment nahi</td></tr>`;
+
+  // Activity feed
+  const feed=document.getElementById('activityFeed');
+  const recent=[...bookings].reverse().slice(0,6);
+  feed.innerHTML=recent.length?recent.map(b=>`<div class="activity-item"><div class="act-dot" style="background:${b.status==='Done'?'var(--success)':b.status==='Cancelled'?'var(--danger)':'var(--gold)'}"></div><div><div class="act-text">${b.name} — ${b.service}</div><div class="act-time">${b.date} ${b.time} · ${b.status}</div></div></div>`).join(''):`<div style="padding:20px;text-align:center;color:var(--muted)">Koi activity nahi</div>`;
+}
+
+// ======== BOOKINGS ========
+function renderBookings(){
+  const{bookings,services}=getData();
+  services.forEach(s=>{
+    const sel=document.getElementById('mb-svc');
+    if(sel&&!sel.querySelector(`option[value="${s.id}"]`))
+      sel.innerHTML+=`<option value="${s.id}">${s.name} — ₨${s.price.toLocaleString()}</option>`;
+  });
+  const q=document.getElementById('bookingSearch')?.value.toLowerCase()||'';
+  const f=document.getElementById('bookingFilter')?.value||'';
+  const filtered=bookings.filter(b=>(b.name?.toLowerCase().includes(q)||b.service?.toLowerCase().includes(q))&&(!f||b.status===f));
+  document.getElementById('bookingsBody').innerHTML=filtered.length?[...filtered].reverse().map(b=>`<tr>
+    <td><span style="font-family:monospace;font-size:11px;color:var(--rose)">${b.id}</span></td>
+    <td><strong>${b.name}</strong><div style="font-size:11px;color:var(--muted)">${b.phone||''}</div></td>
+    <td>${b.phone||'—'}</td>
+    <td>${b.service}</td>
+    <td>${b.date}</td>
+    <td>${b.time}</td>
+    <td><span class="status-pill ${b.status==='Done'?'pill-green':b.status==='Confirmed'?'pill-amber':b.status==='Cancelled'?'pill-red':'pill-gray'}">${b.status}</span></td>
+    <td><div style="display:flex;gap:5px;flex-wrap:wrap">
+      <button class="btn btn-sm btn-success" onclick="updateStatus('${b.id}','Done')">Done</button>
+      <button class="btn btn-sm btn-outline" onclick="updateStatus('${b.id}','Confirmed')">Confirm</button>
+      <button class="btn btn-sm btn-danger" onclick="updateStatus('${b.id}','Cancelled')">✕</button>
+    </div></td>
+  </tr>`).join(''):`<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Koi booking nahi mili</td></tr>`;
+}
+
+function updateStatus(id,status){
+  const bookings=gs('caviiBookings',[]);
+  const b=bookings.find(b=>b.id===id);
+  if(b){b.status=status;ss('caviiBookings',bookings);renderBookings();renderDashboard();toast('Status update: '+status);}
+}
+
+function openBookingModal(){
+  document.getElementById('mb-date').value=new Date().toISOString().split('T')[0];
+  document.getElementById('bookingModal').classList.add('open');
+}
+function saveBooking(){
+  const name=document.getElementById('mb-name').value.trim();
+  if(!name){toast('Naam likhein','err');return}
+  const bookings=gs('caviiBookings',[]);
+  const svc=document.getElementById('mb-svc');
+  const svcText=svc.options[svc.selectedIndex]?.text||'';
+  bookings.push({id:'CVA-'+Math.floor(Math.random()*9000+1000),name,phone:document.getElementById('mb-phone').value,service:svcText.split(' — ')[0],date:document.getElementById('mb-date').value,time:document.getElementById('mb-time').value,note:document.getElementById('mb-note').value,status:'Confirmed',created:new Date().toISOString()});
+  ss('caviiBookings',bookings);
+  closeModal('bookingModal');renderBookings();toast('Booking save ho gayi!');
+  document.getElementById('mb-name').value='';document.getElementById('mb-phone').value='';
+}
+
+// ======== SERVICES ========
+function renderServices(){
+  const{services}=getData();
+  document.getElementById('servicesBody').innerHTML=services.map(s=>`<tr>
+    <td style="font-size:22px">${s.icon}</td>
+    <td><strong>${s.name}</strong><div style="font-size:11px;color:var(--muted)">${s.desc}</div></td>
+    <td><span class="status-pill pill-amber">${s.cat}</span></td>
+    <td style="color:var(--rose);font-weight:500">₨${s.price.toLocaleString()}</td>
+    <td>${s.dur}</td>
+    <td><div style="display:flex;gap:6px">
+      <button class="btn btn-sm btn-outline" onclick="editService(${s.id})">✏ Edit</button>
+      <button class="btn btn-sm btn-danger" onclick="deleteService(${s.id})">🗑</button>
+    </div></td>
+  </tr>`).join('');
+  // Update service selects
+  populateSvcSelects();
+}
+
+function populateSvcSelects(){
+  const{services}=getData();
+  ['mb-svc','mbl-svc'].forEach(sid=>{
+    const el=document.getElementById(sid);
+    if(el){el.innerHTML=services.map(s=>`<option value="${s.id}">${s.name} — ₨${s.price.toLocaleString()}</option>`).join('');}
+  });
+  ss('caviiServices',services); // Sync with user panel
+}
+
+function openServiceModal(id){
+  document.getElementById('svcModalTitle').textContent=id?'✦ Service Edit Karein':'✦ Nayi Service Add Karein';
+  document.getElementById('ms-id').value=id||'';
+  const ig=document.getElementById('iconGrid');
+  ig.innerHTML=icons().map(i=>`<div class="icon-opt" onclick="selIcon(this,'${i}')">${i}</div>`).join('');
+  if(id){
+    const s=getData().services.find(s=>s.id==id);
+    if(s){
+      document.getElementById('ms-icon').value=s.icon;
+      document.getElementById('ms-name').value=s.name;
+      document.getElementById('ms-cat').value=s.cat;
+      document.getElementById('ms-dur').value=s.dur;
+      document.getElementById('ms-price').value=s.price;
+      document.getElementById('ms-disc').value=s.disc||0;
+      document.getElementById('ms-desc').value=s.desc;
+    }
+  } else {
+    ['ms-icon','ms-name','ms-dur','ms-price','ms-desc'].forEach(f=>document.getElementById(f).value='');
+    document.getElementById('ms-disc').value='0';
+  }
+  document.getElementById('serviceModal').classList.add('open');
+}
+function editService(id){openServiceModal(id)}
+function selIcon(el,icon){document.querySelectorAll('.icon-opt').forEach(i=>i.classList.remove('sel'));el.classList.add('sel');document.getElementById('ms-icon').value=icon}
+function saveService(){
+  const name=document.getElementById('ms-name').value.trim();
+  const price=parseInt(document.getElementById('ms-price').value)||0;
+  if(!name){toast('Service naam likhein','err');return}
+  const services=getData().services;
+  const id=document.getElementById('ms-id').value;
+  const obj={icon:document.getElementById('ms-icon').value||'✨',cat:document.getElementById('ms-cat').value,name,desc:document.getElementById('ms-desc').value,price,dur:document.getElementById('ms-dur').value,disc:parseInt(document.getElementById('ms-disc').value)||0};
+  if(id){const i=services.findIndex(s=>s.id==id);if(i>=0){obj.id=parseInt(id);services[i]=obj;}}
+  else{obj.id=Date.now();services.push(obj);}
+  ss('caviiServices',services);closeModal('serviceModal');renderServices();toast('Service save ho gayi!');
+}
+function deleteService(id){
+  if(!confirm('Is service ko delete karein?'))return;
+  const services=getData().services.filter(s=>s.id!==id);
+  ss('caviiServices',services);renderServices();toast('Service delete ho gayi!','err');
+}
+
+// ======== CUSTOMERS ========
+function renderCustomers(){
+  const{customers}=getData();
+  const q=document.getElementById('custSearch')?.value.toLowerCase()||'';
+  const filtered=customers.filter(c=>c.name.toLowerCase().includes(q)||c.phone.includes(q));
+  document.getElementById('customersBody').innerHTML=filtered.map(c=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:#fff;flex-shrink:0">${c.name.split(' ').map(w=>w[0]).join('').substring(0,2).toUpperCase()}</div><strong>${c.name}</strong></div></td>
+    <td>${c.phone}</td>
+    <td>${c.skin}</td>
+    <td>${c.visits}</td>
+    <td style="color:var(--muted)">${c.last||'—'}</td>
+    <td><span class="status-pill ${c.status==='VIP'?'pill-amber':c.status==='New'?'pill-green':'pill-gray'}">${c.status}</span></td>
+    <td><div style="display:flex;gap:5px"><button class="btn btn-sm btn-outline" onclick="editCustomer(${c.id})">✏</button><button class="btn btn-sm btn-danger" onclick="deleteCustomer(${c.id})">🗑</button></div></td>
+  </tr>`).join('');
+}
+function openCustomerModal(){document.getElementById('customerModal').classList.add('open')}
+function editCustomer(id){
+  const c=getData().customers.find(c=>c.id===id);
+  if(!c)return;
+  document.getElementById('mc-name').value=c.name;document.getElementById('mc-phone').value=c.phone;
+  document.getElementById('mc-skin').value=c.skin;document.getElementById('mc-status').value=c.status;document.getElementById('mc-note').value=c.note||'';
+  document.getElementById('customerModal').classList.add('open');
+}
+function saveCustomer(){
+  const name=document.getElementById('mc-name').value.trim();
+  if(!name){toast('Naam likhein','err');return}
+  const customers=getData().customers;
+  customers.push({id:Date.now(),name,phone:document.getElementById('mc-phone').value,skin:document.getElementById('mc-skin').value,status:document.getElementById('mc-status').value,note:document.getElementById('mc-note').value,visits:0,last:''});
+  ss('caviiCustomers',customers);closeModal('customerModal');renderCustomers();toast('Customer add ho gayi!');
+}
+function deleteCustomer(id){if(!confirm('Delete?'))return;const c=getData().customers.filter(c=>c.id!==id);ss('caviiCustomers',c);renderCustomers();toast('Deleted!','err')}
+
+// ======== STOCK ========
+function renderStock(){
+  const{stock}=getData();
+  document.getElementById('stockBody').innerHTML=stock.map(s=>{
+    const pct=Math.min(100,Math.round((s.qty/Math.max(s.min*2,1))*100));
+    const col=s.qty===0?'#e04040':s.qty<=s.min?'var(--warn)':'var(--success)';
+    const lbl=s.qty===0?'pill-red':s.qty<=s.min?'pill-amber':'pill-green';
+    const st=s.qty===0?'Out of Stock':s.qty<=s.min?'Low Stock':'In Stock';
+    return`<tr>
+      <td><strong>${s.name}</strong></td>
+      <td><span class="status-pill pill-gray">${s.cat}</span></td>
+      <td><strong style="color:${col}">${s.qty} ${s.unit}</strong></td>
+      <td style="color:var(--muted)">${s.min} ${s.unit}</td>
+      <td><div class="stock-bar-wrap"><div class="stock-bar" style="width:${pct}%;background:${col}"></div></div></td>
+      <td><span class="status-pill ${lbl}">${st}</span></td>
+      <td><div style="display:flex;gap:5px">
+        <button class="btn btn-sm btn-success" onclick="adjustQty(${s.id},1)">+</button>
+        <button class="btn btn-sm btn-outline" onclick="adjustQty(${s.id},-1)">−</button>
+        <button class="btn btn-sm btn-outline" onclick="editStock(${s.id})">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteStock(${s.id})">🗑</button>
+      </div></td>
+    </tr>`;
+  }).join('');
+}
+function adjustQty(id,delta){const stock=getData().stock;const s=stock.find(s=>s.id===id);if(s){s.qty=Math.max(0,s.qty+delta);ss('caviiStock',stock);renderStock();toast(`${s.name}: ${s.qty} ${s.unit}`);}}
+function openStockModal(id){document.getElementById('stModalTitle').textContent=id?'✦ Product Edit':'✦ Product Add';['mst-name','mst-qty','mst-min'].forEach(f=>document.getElementById(f).value='');document.getElementById('mst-id').value=id||'';if(id){const s=getData().stock.find(s=>s.id===id);if(s){document.getElementById('mst-name').value=s.name;document.getElementById('mst-cat').value=s.cat;document.getElementById('mst-qty').value=s.qty;document.getElementById('mst-min').value=s.min;document.getElementById('mst-unit').value=s.unit;}}document.getElementById('stockModal').classList.add('open')}
+function editStock(id){openStockModal(id)}
+function saveStock(){
+  const name=document.getElementById('mst-name').value.trim();
+  if(!name){toast('Product naam likhein','err');return}
+  const stock=getData().stock;
+  const id=document.getElementById('mst-id').value;
+  const obj={name,cat:document.getElementById('mst-cat').value,qty:parseInt(document.getElementById('mst-qty').value)||0,min:parseInt(document.getElementById('mst-min').value)||1,unit:document.getElementById('mst-unit').value};
+  if(id){const i=stock.findIndex(s=>s.id==id);if(i>=0){obj.id=parseInt(id);stock[i]=obj;}}else{obj.id=Date.now();stock.push(obj);}
+  ss('caviiStock',stock);closeModal('stockModal');renderStock();toast('Product save ho gaya!');
+}
+function deleteStock(id){if(!confirm('Delete?'))return;ss('caviiStock',getData().stock.filter(s=>s.id!==id));renderStock();toast('Deleted!','err')}
+
+// ======== STAFF ========
+function renderStaff(){
+  const{staff}=getData();
+  document.getElementById('staffBody').innerHTML=staff.map(s=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:10px"><div style="width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#a07030);display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;font-weight:600">${s.name.split(' ').map(w=>w[0]).join('').substring(0,2)}</div><strong>${s.name}</strong></div></td>
+    <td><span class="status-pill pill-amber">${s.role}</span></td>
+    <td style="color:var(--muted);font-size:12px">${s.spec}</td>
+    <td style="font-size:12px;color:var(--muted)">${s.schedule}</td>
+    <td style="color:var(--success);font-weight:500">₨${s.salary.toLocaleString()}</td>
+    <td><div style="display:flex;gap:5px"><button class="btn btn-sm btn-outline" onclick="editStaffM(${s.id})">✏</button><button class="btn btn-sm btn-danger" onclick="deleteStaff(${s.id})">🗑</button></div></td>
+  </tr>`).join('');
+}
+function openStaffModal(){['mst2-name','mst2-spec','mst2-sal','mst2-sch'].forEach(f=>document.getElementById(f).value='');document.getElementById('staffModal').classList.add('open')}
+function editStaffM(id){const s=getData().staff.find(s=>s.id===id);if(!s)return;document.getElementById('mst2-name').value=s.name;document.getElementById('mst2-role').value=s.role;document.getElementById('mst2-spec').value=s.spec;document.getElementById('mst2-sal').value=s.salary;document.getElementById('mst2-sch').value=s.schedule;document.getElementById('staffModal').classList.add('open')}
+function saveStaff(){
+  const name=document.getElementById('mst2-name').value.trim();
+  if(!name){toast('Naam likhein','err');return}
+  const staff=getData().staff;
+  staff.push({id:Date.now(),name,role:document.getElementById('mst2-role').value,spec:document.getElementById('mst2-spec').value,schedule:document.getElementById('mst2-sch').value,salary:parseInt(document.getElementById('mst2-sal').value)||0});
+  ss('caviiStaff',staff);closeModal('staffModal');renderStaff();toast('Staff member add ho gayi!');
+}
+function deleteStaff(id){if(!confirm('Delete?'))return;ss('caviiStaff',getData().staff.filter(s=>s.id!==id));renderStaff();toast('Deleted!','err')}
+
+// ======== BILLING ========
+function renderBilling(){
+  const{bills}=getData();
+  const today=new Date().toISOString().split('T')[0];
+  const todayRev=bills.filter(b=>b.date===today).reduce((a,b)=>a+(b.amount-b.disc),0);
+  const monthRev=bills.reduce((a,b)=>a+(b.amount-b.disc),0);
+  document.getElementById('b-today').textContent='₨'+todayRev.toLocaleString();
+  document.getElementById('b-month').textContent='₨'+monthRev.toLocaleString();
+  document.getElementById('b-count').textContent=bills.length;
+  document.getElementById('billsBody').innerHTML=bills.length?[...bills].reverse().map(b=>`<tr>
+    <td><span style="font-family:monospace;color:var(--rose);font-size:11px">${b.id}</span></td>
+    <td>${b.customer}</td>
+    <td>${b.service}</td>
+    <td><strong style="color:var(--success)">₨${(b.amount-b.disc).toLocaleString()}</strong>${b.disc?`<div style="font-size:11px;color:var(--muted)">-₨${b.disc} disc.</div>`:''}</td>
+    <td><span class="status-pill pill-green">${b.payment}</span></td>
+    <td>${b.date}</td>
+    <td><button class="btn btn-sm btn-outline" onclick="printBill('${b.id}')">🖨 Print</button></td>
+  </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">Koi bill nahi</td></tr>`;
+}
+function openBillModal(){
+  const{services}=getData();
+  document.getElementById('mbl-svc').innerHTML=services.map(s=>`<option value="${s.id}">${s.name} — ₨${s.price.toLocaleString()}</option>`).join('');
+  document.getElementById('billModal').classList.add('open');
+}
+function saveBill(){
+  const c=document.getElementById('mbl-cust').value.trim();
+  if(!c){toast('Customer naam likhein','err');return}
+  const bills=gs('caviiBills',[]);
+  const svcEl=document.getElementById('mbl-svc');
+  bills.push({id:'BL-'+Math.floor(Math.random()*9000+1000),customer:c,service:svcEl.options[svcEl.selectedIndex]?.text.split(' — ')[0]||'',amount:parseInt(document.getElementById('mbl-amt').value)||0,disc:parseInt(document.getElementById('mbl-disc').value)||0,payment:document.getElementById('mbl-pay').value,date:new Date().toISOString().split('T')[0]});
+  ss('caviiBills',bills);closeModal('billModal');renderBilling();toast('Bill save ho gaya!');
+  document.getElementById('mbl-cust').value='';document.getElementById('mbl-amt').value='';
+}
+function printBill(id){toast('Print feature: Browser Ctrl+P use karein')}
+
+// ======== REPORTS ========
+function renderReports(){
+  const{bookings,bills,customers}=getData();
+  const monthRev=bills.reduce((a,b)=>a+(b.amount-b.disc),0);
+  document.getElementById('r-rev').textContent='₨'+monthRev.toLocaleString();
+  document.getElementById('r-appts').textContent=bookings.length;
+  document.getElementById('r-new').textContent=customers.filter(c=>c.status==='New').length;
+  const svcCount={};bookings.forEach(b=>{svcCount[b.service]=(svcCount[b.service]||0)+1});
+  const topSvc=Object.entries(svcCount).sort((a,b)=>b[1]-a[1])[0];
+  document.getElementById('r-top').textContent=topSvc?topSvc[0]:'—';
+  // Top services chart
+  const top=Object.entries(svcCount).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  const maxC=Math.max(...top.map(([,c])=>c),1);
+  document.getElementById('topServicesChart').innerHTML=top.map(([name,cnt])=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--text)">${name}</span><span style="color:var(--rose);font-weight:500">${cnt} bookings</span></div>
+      <div class="stock-bar-wrap"><div class="stock-bar" style="width:${(cnt/maxC)*100}%;background:linear-gradient(90deg,var(--rose-deep),var(--rose))"></div></div>
+    </div>`).join('')||'<div style="color:var(--muted);text-align:center;padding:20px">Data nahi mila</div>';
+  // Payment chart
+  const pay={};bills.forEach(b=>{pay[b.payment]=(pay[b.payment]||0)+(b.amount-b.disc)});
+  const payTotal=Object.values(pay).reduce((a,b)=>a+b,0)||1;
+  const cols=['var(--rose)','var(--gold)','var(--success)','#5d8dee','#dd6ed4'];
+  document.getElementById('paymentChart').innerHTML=Object.entries(pay).map(([k,v],i)=>`
+    <div style="margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px"><span style="color:var(--text)">${k}</span><span style="color:${cols[i%cols.length]};font-weight:500">₨${v.toLocaleString()}</span></div>
+      <div class="stock-bar-wrap"><div class="stock-bar" style="width:${(v/payTotal)*100}%;background:${cols[i%cols.length]}"></div></div>
+    </div>`).join('')||'<div style="color:var(--muted);text-align:center;padding:20px">Bill data nahi mila</div>';
+}
+
+// ======== SETTINGS ========
+function saveSettings(){toast('Settings save ho gayi!')}
+
+// ======== MODAL HELPERS ========
+function closeModal(id){document.getElementById(id).classList.remove('open')}
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
+
+// ======== DATA RESET ========
+function resetAll(){['caviiBookings','caviiCustomers','caviiStock','caviiStaff','caviiBills'].forEach(k=>localStorage.removeItem(k));toast('All data reset!','err');renderDashboard()}
+
+// ======== DATE ========
+document.getElementById('tbDate').textContent=new Date().toLocaleDateString('en-PK',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+document.getElementById('mb-date').value=new Date().toISOString().split('T')[0];
+
+// ======== INIT ========
+function initApp(){renderDashboard();populateSvcSelects()}
+</script>
+</body>
+</html>
