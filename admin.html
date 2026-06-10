@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cavii Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{--rose:#c8295a;--rose-deep:#8b1a3d;--rose-light:#f7e0e8;--gold:#c9973e;--gold-light:#f5e6cc;--cream:#fdf6f0;--dark:#1a0a0f;--dark2:#2d1520;--text:#3d1a27;--muted:#7a5060}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',sans-serif;background:#0f0508;color:#fff;min-height:100vh}
+
+/* LOGIN */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0f0508,#1a0a0f,#2d1520)}
+.login-box{background:rgba(255,255,255,.04);border:1px solid rgba(200,41,90,.2);border-radius:28px;padding:48px 40px;width:100%;max-width:400px;text-align:center}
+.login-logo{font-family:'Playfair Display',serif;font-size:28px;color:#fff;margin-bottom:6px}
+.login-logo em{color:var(--gold);font-style:italic}
+.login-sub{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:36px;letter-spacing:.5px}
+.login-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 18px;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:14px;transition:all .3s}
+.login-input:focus{border-color:rgba(200,41,90,.5);background:rgba(200,41,90,.05)}
+.login-input::placeholder{color:rgba(255,255,255,.25)}
+.login-btn{width:100%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;border:none;padding:15px;border-radius:12px;font-size:15px;font-weight:500;cursor:pointer;transition:all .3s;margin-top:4px}
+.login-btn:hover{box-shadow:0 8px 24px rgba(200,41,90,.4);transform:translateY(-2px)}
+.login-err{background:rgba(200,41,90,.15);border:1px solid rgba(200,41,90,.3);border-radius:10px;padding:10px;font-size:13px;color:#f48fb1;margin-bottom:14px;display:none}
+.login-err.show{display:block}
+
+/* ADMIN LAYOUT */
+#adminApp{display:none;min-height:100vh;background:#0f0508}
+#adminApp.show{display:flex}
+.sidebar{width:240px;background:rgba(255,255,255,.03);border-right:1px solid rgba(255,255,255,.06);padding:28px 0;flex-shrink:0;display:flex;flex-direction:column}
+.sidebar-logo{font-family:'Playfair Display',serif;font-size:20px;color:#fff;padding:0 24px;margin-bottom:32px}
+.sidebar-logo em{color:var(--gold);font-style:italic}
+.sidebar-logo span{display:block;font-size:11px;color:rgba(255,255,255,.3);font-family:'DM Sans',sans-serif;font-style:normal;margin-top:2px;letter-spacing:.5px}
+.nav-item{display:flex;align-items:center;gap:12px;padding:13px 24px;cursor:pointer;transition:all .2s;color:rgba(255,255,255,.5);font-size:14px;border-left:3px solid transparent}
+.nav-item:hover{color:#fff;background:rgba(255,255,255,.04)}
+.nav-item.active{color:#fff;background:rgba(200,41,90,.1);border-left-color:var(--rose)}
+.nav-item-icon{font-size:18px;width:22px;text-align:center}
+.sidebar-bottom{margin-top:auto;padding:0 16px}
+.logout-btn{width:100%;background:rgba(200,41,90,.1);border:1px solid rgba(200,41,90,.2);color:rgba(255,255,255,.6);padding:11px;border-radius:12px;cursor:pointer;font-size:13px;transition:all .3s}
+.logout-btn:hover{background:var(--rose);color:#fff;border-color:var(--rose)}
+.back-site-btn{width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);color:rgba(255,255,255,.5);padding:11px;border-radius:12px;cursor:pointer;font-size:13px;transition:all .3s;margin-bottom:10px;text-decoration:none;display:block;text-align:center}
+.back-site-btn:hover{background:rgba(255,255,255,.08);color:#fff}
+
+.main-content{flex:1;overflow-y:auto;padding:32px}
+.page{display:none}
+.page.active{display:block}
+.page-title{font-family:'Playfair Display',serif;font-size:26px;color:#fff;margin-bottom:24px}
+.page-title em{color:var(--rose);font-style:italic}
+
+/* STATS */
+.stats-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;margin-bottom:28px}
+.stat-box{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:20px;text-align:center}
+.stat-box-num{font-family:'Playfair Display',serif;font-size:30px;color:var(--rose);margin-bottom:4px}
+.stat-box-label{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.8px;text-transform:uppercase}
+
+/* BOOKINGS TABLE */
+.table-wrap{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;overflow:hidden}
+.table-header{padding:16px 20px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;justify-content:space-between;flex-wrap:gap}
+.table-header h3{font-size:15px;color:#fff;font-weight:500}
+.search-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:8px 14px;color:#fff;font-size:13px;outline:none;width:200px}
+.search-input::placeholder{color:rgba(255,255,255,.25)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:12px 16px;color:rgba(255,255,255,.3);font-size:11px;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.06)}
+td{padding:14px 16px;color:rgba(255,255,255,.75);border-bottom:1px solid rgba(255,255,255,.04);font-size:13px;vertical-align:top}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(255,255,255,.02)}
+.badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;display:inline-block}
+.badge-pending{background:rgba(201,151,62,.15);color:#f0b862}
+.badge-confirmed{background:rgba(76,175,80,.15);color:#81c784}
+.badge-cancelled{background:rgba(200,41,90,.15);color:#f48fb1}
+.act-btn{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#fff;padding:5px 11px;border-radius:8px;cursor:pointer;font-size:11px;transition:all .2s;margin-right:4px}
+.act-btn:hover{background:var(--rose);border-color:var(--rose)}
+.act-btn.danger:hover{background:#c62828;border-color:#c62828}
+
+/* SERVICES */
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}
+.svc-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:20px}
+.svc-card label{display:block;font-size:11px;color:rgba(255,255,255,.35);letter-spacing:.6px;text-transform:uppercase;margin-bottom:5px;margin-top:10px}
+.svc-card label:first-of-type{margin-top:0}
+.svc-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border .2s}
+.svc-input:focus{border-color:rgba(200,41,90,.4)}
+.svc-card-footer{display:flex;justify-content:space-between;margin-top:14px;gap:8px}
+.svc-save-btn{flex:1;background:var(--rose);color:#fff;border:none;padding:9px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s}
+.svc-save-btn:hover{background:var(--rose-deep)}
+.svc-del-btn{background:rgba(200,41,90,.1);border:1px solid rgba(200,41,90,.2);color:rgba(200,41,90,.8);padding:9px 14px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s}
+.svc-del-btn:hover{background:var(--rose);color:#fff;border-color:var(--rose)}
+.add-svc-card{background:rgba(201,151,62,.05);border:1.5px dashed rgba(201,151,62,.3);border-radius:16px;padding:20px;text-align:center;cursor:pointer;color:var(--gold);font-size:14px;transition:all .3s;display:flex;align-items:center;justify-content:center;min-height:200px}
+.add-svc-card:hover{background:rgba(201,151,62,.1)}
+
+/* BLOCK TIMES */
+.block-section{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;margin-bottom:20px}
+.block-section h3{font-size:15px;color:#fff;margin-bottom:18px;font-weight:500}
+.block-date-row{display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap}
+.block-date-row label{font-size:13px;color:rgba(255,255,255,.4)}
+.date-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 14px;color:#fff;font-size:13px;outline:none}
+.slots-grid{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.slot-toggle{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);padding:8px 14px;border-radius:10px;cursor:pointer;font-size:13px;transition:all .2s}
+.slot-toggle.blocked{background:rgba(200,41,90,.2);border-color:rgba(200,41,90,.4);color:#f48fb1}
+.slot-toggle.booked-by-client{background:rgba(201,151,62,.1);border-color:rgba(201,151,62,.3);color:#f0b862;cursor:not-allowed}
+.save-block-btn{background:var(--rose);color:#fff;border:none;padding:11px 24px;border-radius:10px;cursor:pointer;font-size:13px;margin-top:16px;transition:all .2s}
+.save-block-btn:hover{background:var(--rose-deep)}
+.overview-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.04);font-size:13px}
+.overview-item:last-child{border-bottom:none}
+.overview-date{color:#f7a0b8;min-width:100px}
+.overview-slots{color:rgba(255,255,255,.5)}
+
+/* SETTINGS */
+.settings-section{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);border-radius:16px;padding:24px;margin-bottom:20px}
+.settings-section h3{font-size:15px;color:#fff;margin-bottom:18px;font-weight:500}
+.setting-row{display:flex;align-items:center;justify-content:space-between;padding:14px 0;border-bottom:1px solid rgba(255,255,255,.04)}
+.setting-row:last-child{border-bottom:none}
+.setting-label{font-size:14px;color:rgba(255,255,255,.7)}
+.setting-sub{font-size:12px;color:rgba(255,255,255,.3);margin-top:2px}
+.setting-input{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;outline:none;min-width:200px}
+.setting-save-btn{background:var(--rose);color:#fff;border:none;padding:10px 22px;border-radius:10px;cursor:pointer;font-size:13px;transition:all .2s;margin-top:16px}
+.setting-save-btn:hover{background:var(--rose-deep)}
+.pwd-change-form{display:grid;gap:10px;margin-top:10px}
+
+/* TOAST */
+.toast{position:fixed;bottom:30px;right:30px;background:rgba(26,10,15,.95);border:1px solid rgba(200,41,90,.3);color:#fff;padding:14px 22px;border-radius:14px;font-size:14px;z-index:999;transform:translateY(20px);opacity:0;transition:all .3s;pointer-events:none}
+.toast.show{transform:translateY(0);opacity:1}
+
+@media(max-width:768px){
+  .sidebar{display:none}
+  .stats-row{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-box">
+    <div class="login-logo">Cavii <em>✦</em> Admin<span>ADMIN PANEL</span></div>
+    <div class="login-err" id="loginErr">❌ Galat username ya password</div>
+    <input type="text" class="login-input" id="loginUser" placeholder="Username" onkeydown="if(event.key==='Enter')doLogin()">
+    <input type="password" class="login-input" id="loginPass" placeholder="Password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">🔐 Login Karein</button>
+    <div style="margin-top:20px;font-size:12px;color:rgba(255,255,255,.2)">Default: admin / cavii2026</div>
+  </div>
+</div>
+
+<!-- ADMIN APP -->
+<div id="adminApp">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-logo">Cavii <em>✦</em><span>Admin Panel</span></div>
+    <div class="nav-item active" onclick="showPage('dashboard')"><span class="nav-item-icon">📊</span> Dashboard</div>
+    <div class="nav-item" onclick="showPage('bookings')"><span class="nav-item-icon">📋</span> Bookings</div>
+    <div class="nav-item" onclick="showPage('services')"><span class="nav-item-icon">✂</span> Services</div>
+    <div class="nav-item" onclick="showPage('blocked')"><span class="nav-item-icon">⏰</span> Block Times</div>
+    <div class="nav-item" onclick="showPage('settings')"><span class="nav-item-icon">⚙</span> Settings</div>
+    <div class="sidebar-bottom">
+      <a href="index.html" class="back-site-btn">🌸 Customer Site</a>
+      <button class="logout-btn" onclick="doLogout()">🚪 Logout</button>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="main-content">
+
+    <!-- DASHBOARD -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-title">Dashboard <em>Overview</em></div>
+      <div class="stats-row" id="dashStats"></div>
+      <div class="table-wrap">
+        <div class="table-header"><h3>📋 Recent Bookings</h3></div>
+        <table><thead><tr><th>ID</th><th>Client</th><th>Services</th><th>Date & Time</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="recentBookings"></tbody></table>
+      </div>
+    </div>
+
+    <!-- BOOKINGS -->
+    <div class="page" id="page-bookings">
+      <div class="page-title">Saari <em>Bookings</em></div>
+      <div class="table-wrap">
+        <div class="table-header">
+          <h3>All Appointments</h3>
+          <input type="text" class="search-input" placeholder="Search naam, ID..." oninput="searchBookings(this.value)">
+        </div>
+        <table><thead><tr><th>ID</th><th>Client</th><th>Services</th><th>Date & Time</th><th>Note</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody id="allBookings"></tbody></table>
+      </div>
+    </div>
+
+    <!-- SERVICES -->
+    <div class="page" id="page-services">
+      <div class="page-title">Services <em>Manage</em> Karein</div>
+      <div class="services-grid" id="servicesGrid"></div>
+    </div>
+
+    <!-- BLOCK TIMES -->
+    <div class="page" id="page-blocked">
+      <div class="page-title">Times <em>Block</em> Karein</div>
+      <div class="block-section">
+        <h3>📅 Kisi Din ke Times Block Karein</h3>
+        <div class="block-date-row">
+          <label>Tarikh:</label>
+          <input type="date" class="date-input" id="blockDateInput" onchange="loadBlockSlots()">
+        </div>
+        <div style="font-size:12px;color:rgba(255,255,255,.3);margin-bottom:4px">🟡 = Client ne book kiya &nbsp; 🔴 = Aapne block kiya</div>
+        <div class="slots-grid" id="blockSlotsGrid"></div>
+        <button class="save-block-btn" onclick="saveBlockedSlots()">💾 Save Karein</button>
+      </div>
+      <div class="block-section">
+        <h3>📋 Blocked Dates</h3>
+        <div id="blockedOverview"></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="page-title">Panel <em>Settings</em></div>
+      <div class="settings-section">
+        <h3>🏪 Salon Info</h3>
+        <div class="setting-row">
+          <div><div class="setting-label">Salon Name</div><div class="setting-sub">Website pe dikhega</div></div>
+          <input class="setting-input" id="set-name" value="Cavii Salon">
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">WhatsApp Number</div><div class="setting-sub">Customers contact karein</div></div>
+          <input class="setting-input" id="set-phone" value="923001234567">
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Address</div></div>
+          <input class="setting-input" id="set-addr" value="Faisalabad, Punjab">
+        </div>
+        <button class="setting-save-btn" onclick="saveSettings()">💾 Save Info</button>
+      </div>
+      <div class="settings-section">
+        <h3>🔐 Password Change Karein</h3>
+        <div class="pwd-change-form">
+          <input type="password" class="setting-input" id="oldPwd" placeholder="Purana password" style="min-width:unset">
+          <input type="password" class="setting-input" id="newPwd" placeholder="Naya password" style="min-width:unset">
+          <input type="password" class="setting-input" id="newPwd2" placeholder="Naya password dobara" style="min-width:unset">
+          <button class="setting-save-btn" onclick="changePwd()">🔐 Password Badlein</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <h3>🗑 Data Management</h3>
+        <div class="setting-row">
+          <div><div class="setting-label">Saari Bookings Delete Karein</div><div class="setting-sub">Yeh action undo nahi ho sakta</div></div>
+          <button class="act-btn danger" onclick="clearBookings()">Delete All</button>
+        </div>
+        <div class="setting-row">
+          <div><div class="setting-label">Services Reset Karein</div><div class="setting-sub">Default services wapas aayein gi</div></div>
+          <button class="act-btn danger" onclick="resetServices()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const DEFAULT_SERVICES=[
+  {id:1,icon:'💆',cat:'Hair Treatment',name:'Keratin Treatment',desc:'Smooth, frizz-free silky hair for weeks.',price:8000,dur:120},
+  {id:2,icon:'🌊',cat:'Hair Treatment',name:'Hair Spa',desc:'Deep nourishment & scalp healing therapy.',price:4500,dur:90},
+  {id:3,icon:'💉',cat:'Hair Treatment',name:'Hair PRP',desc:'Platelet-rich plasma for hair regrowth.',price:12000,dur:90},
+  {id:4,icon:'✨',cat:'Skin Treatment',name:'Hydra Facial',desc:'Deep hydration & skin brightening treatment.',price:5500,dur:60},
+  {id:5,icon:'🔬',cat:'Skin Treatment',name:'Skin PRP',desc:'Anti-aging & skin rejuvenation therapy.',price:15000,dur:60},
+  {id:6,icon:'🪡',cat:'Skin Treatment',name:'Microneedling',desc:'Collagen induction for younger looking skin.',price:7000,dur:60},
+  {id:7,icon:'💊',cat:'Skin Treatment',name:'Whitening Injection',desc:'Glutathione for skin brightening & glow.',price:10000,dur:45},
+  {id:8,icon:'⚡',cat:'Laser & Wax',name:'Laser Hair Removal',desc:'Permanent hair removal with advanced laser.',price:9000,dur:45},
+  {id:9,icon:'🕯️',cat:'Laser & Wax',name:'Full Body Waxing',desc:'Smooth skin with premium quality wax.',price:3500,dur:60},
+  {id:10,icon:'💄',cat:'Makeup',name:'Bridal Makeup',desc:'Complete bridal look with HD coverage.',price:25000,dur:180},
+  {id:11,icon:'🌟',cat:'Makeup',name:'Party Makeup',desc:'Glamorous party-ready look by experts.',price:6000,dur:90},
+  {id:12,icon:'🧖',cat:'Facial',name:'Glow Facial',desc:'Vitamin C & gold brightening facial.',price:3500,dur:60},
+];
+const ALL_SLOTS=['09:00 AM','10:00 AM','11:00 AM','12:00 PM','01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM','06:00 PM','07:00 PM'];
+
+// ---- HELPERS ----
+function getServices(){return JSON.parse(localStorage.getItem('caviiServices')||'null')||DEFAULT_SERVICES}
+function saveServices(s){localStorage.setItem('caviiServices',JSON.stringify(s))}
+function getBookings(){return JSON.parse(localStorage.getItem('caviiBookings')||'[]')}
+function saveBookings(b){localStorage.setItem('caviiBookings',JSON.stringify(b))}
+function getBlocked(){return JSON.parse(localStorage.getItem('caviiBlocked')||'{}')}
+function saveBlocked(m){localStorage.setItem('caviiBlocked',JSON.stringify(m))}
+function getCreds(){return JSON.parse(localStorage.getItem('caviiCreds')||'{"user":"admin","pass":"cavii2026"}')}
+function saveCreds(c){localStorage.setItem('caviiCreds',JSON.stringify(c))}
+function getSettings(){return JSON.parse(localStorage.getItem('caviiSettings')||'{"name":"Cavii Salon","phone":"923001234567","addr":"Faisalabad, Punjab"}')}
+function saveSettingsData(s){localStorage.setItem('caviiSettings',JSON.stringify(s))}
+
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800)}
+
+// ---- LOGIN ----
+function doLogin(){
+  const u=document.getElementById('loginUser').value.trim();
+  const p=document.getElementById('loginPass').value;
+  const creds=getCreds();
+  if(u===creds.user&&p===creds.pass){
+    sessionStorage.setItem('caviiLoggedIn','1');
+    document.getElementById('loginWrap').style.display='none';
+    document.getElementById('adminApp').classList.add('show');
+    initAdmin();
+  } else {
+    document.getElementById('loginErr').classList.add('show');
+    document.getElementById('loginPass').value='';
+  }
+}
+function doLogout(){sessionStorage.removeItem('caviiLoggedIn');location.reload()}
+
+// Auto-check session
+if(sessionStorage.getItem('caviiLoggedIn')==='1'){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('adminApp').classList.add('show');
+  initAdmin();
+}
+
+// ---- NAV ----
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(name==='bookings') renderAllBookings();
+  if(name==='services') renderServices();
+  if(name==='blocked') loadBlockedOverview();
+  if(name==='settings') loadSettings();
+}
+
+// ---- INIT ----
+function initAdmin(){
+  renderDashboard();
+  document.getElementById('blockDateInput').min=new Date().toISOString().split('T')[0];
+}
+
+// ---- DASHBOARD ----
+function renderDashboard(){
+  const bk=getBookings();
+  const rev=bk.reduce((a,b)=>a+(b.total||0),0);
+  document.getElementById('dashStats').innerHTML=`
+    <div class="stat-box"><div class="stat-box-num">${bk.length}</div><div class="stat-box-label">Total Bookings</div></div>
+    <div class="stat-box"><div class="stat-box-num">${bk.filter(b=>b.status==='Pending').length}</div><div class="stat-box-label">Pending</div></div>
+    <div class="stat-box"><div class="stat-box-num">${bk.filter(b=>b.status==='Confirmed').length}</div><div class="stat-box-label">Confirmed</div></div>
+    <div class="stat-box"><div class="stat-box-num">${bk.filter(b=>b.status==='Cancelled').length}</div><div class="stat-box-label">Cancelled</div></div>
+    <div class="stat-box"><div class="stat-box-num" style="font-size:20px">₨${rev.toLocaleString()}</div><div class="stat-box-label">Revenue</div></div>
+    <div class="stat-box"><div class="stat-box-num">${getServices().length}</div><div class="stat-box-label">Services</div></div>
+  `;
+  const recent=[...bk].reverse().slice(0,8);
+  document.getElementById('recentBookings').innerHTML=bookingRows(recent);
+}
+
+// ---- BOOKINGS ----
+function bookingRows(list){
+  if(!list.length) return `<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,.25);padding:40px">Koi booking nahi</td></tr>`;
+  return list.map(b=>`<tr>
+    <td style="font-family:monospace;color:var(--rose);font-size:12px">${b.id}</td>
+    <td><div style="font-weight:600;font-size:13px">${b.name}</div><div style="color:rgba(255,255,255,.35);font-size:11px">${b.phone}</div></td>
+    <td style="font-size:12px;max-width:160px;line-height:1.5">${b.services||b.service||''}</td>
+    <td><div style="font-size:13px">${b.date}</div><div style="color:rgba(255,255,255,.4);font-size:11px">${b.time}</div></td>
+    <td style="color:var(--gold);font-size:13px">₨${(b.total||0).toLocaleString()}</td>
+    <td><span class="badge badge-${(b.status||'pending').toLowerCase()}">${b.status||'Pending'}</span></td>
+    <td>
+      <button class="act-btn" onclick="setStatus('${b.id}','Confirmed')">✓ Confirm</button>
+      <button class="act-btn danger" onclick="setStatus('${b.id}','Cancelled')">✕ Cancel</button>
+      <button class="act-btn danger" onclick="deleteBooking('${b.id}')">🗑</button>
+    </td>
+  </tr>`).join('');
+}
+
+function renderAllBookings(filter=''){
+  let bk=[...getBookings()].reverse();
+  if(filter) bk=bk.filter(b=>b.name.toLowerCase().includes(filter)||b.id.toLowerCase().includes(filter)||( b.phone&&b.phone.includes(filter)));
+  document.getElementById('allBookings').innerHTML=bookingRowsFull(bk);
+}
+
+function bookingRowsFull(list){
+  if(!list.length) return `<tr><td colspan="8" style="text-align:center;color:rgba(255,255,255,.25);padding:40px">Koi booking nahi</td></tr>`;
+  return list.map(b=>`<tr>
+    <td style="font-family:monospace;color:var(--rose);font-size:12px">${b.id}</td>
+    <td><div style="font-weight:600;font-size:13px">${b.name}</div><div style="color:rgba(255,255,255,.35);font-size:11px">${b.phone}</div></td>
+    <td style="font-size:12px;max-width:150px;line-height:1.5">${b.services||b.service||''}</td>
+    <td><div>${b.date}</div><div style="color:rgba(255,255,255,.4);font-size:11px">${b.time}</div></td>
+    <td style="font-size:12px;color:rgba(255,255,255,.4)">${b.note||'—'}</td>
+    <td style="color:var(--gold);font-size:13px">₨${(b.total||0).toLocaleString()}</td>
+    <td><span class="badge badge-${(b.status||'pending').toLowerCase()}">${b.status||'Pending'}</span></td>
+    <td>
+      <button class="act-btn" onclick="setStatus('${b.id}','Confirmed');renderAllBookings()">✓</button>
+      <button class="act-btn" onclick="setStatus('${b.id}','Cancelled');renderAllBookings()">✕</button>
+      <button class="act-btn danger" onclick="deleteBooking('${b.id}');renderAllBookings()">🗑</button>
+    </td>
+  </tr>`).join('');
+}
+
+function setStatus(id,status){
+  const bk=getBookings();
+  const b=bk.find(x=>x.id===id);
+  if(b){b.status=status;saveBookings(bk);toast('✓ Status update ho gaya');}
+  renderDashboard();
+}
+function deleteBooking(id){
+  if(!confirm('Yeh booking delete karein?')) return;
+  saveBookings(getBookings().filter(b=>b.id!==id));
+  toast('🗑 Booking delete ho gayi');
+  renderDashboard();
+}
+function searchBookings(v){renderAllBookings(v.toLowerCase())}
+
+// ---- SERVICES ----
+function renderServices(){
+  const svcs=getServices();
+  document.getElementById('servicesGrid').innerHTML=svcs.map(s=>`
+    <div class="svc-card">
+      <label>Icon (emoji)</label><input class="svc-input" id="si-${s.id}" value="${s.icon}">
+      <label>Naam</label><input class="svc-input" id="sn-${s.id}" value="${s.name}">
+      <label>Category</label><input class="svc-input" id="sc-${s.id}" value="${s.cat}">
+      <label>Description</label><input class="svc-input" id="sd-${s.id}" value="${s.desc}">
+      <label>Price (₨)</label><input class="svc-input" type="number" id="sp-${s.id}" value="${s.price}">
+      <label>Duration (minutes)</label><input class="svc-input" type="number" id="sdur-${s.id}" value="${s.dur}">
+      <div class="svc-card-footer">
+        <button class="svc-save-btn" onclick="saveService(${s.id})">💾 Save</button>
+        <button class="svc-del-btn" onclick="deleteService(${s.id})">🗑</button>
+      </div>
+    </div>
+  `).join('')+`<div class="add-svc-card" onclick="addService()">+ Nai Service Add Karein</div>`;
+}
+
+function saveService(id){
+  const svcs=getServices();
+  const i=svcs.findIndex(s=>s.id===id);
+  if(i<0) return;
+  svcs[i]={...svcs[i],icon:document.getElementById('si-'+id).value,name:document.getElementById('sn-'+id).value,cat:document.getElementById('sc-'+id).value,desc:document.getElementById('sd-'+id).value,price:parseInt(document.getElementById('sp-'+id).value)||0,dur:parseInt(document.getElementById('sdur-'+id).value)||60};
+  saveServices(svcs);toast('✓ Service save ho gayi!');
+}
+function deleteService(id){
+  if(!confirm('Delete karein?')) return;
+  saveServices(getServices().filter(s=>s.id!==id));
+  renderServices();toast('🗑 Service delete ho gayi');
+}
+function addService(){
+  const svcs=getServices();
+  const newId=Math.max(...svcs.map(s=>s.id),0)+1;
+  svcs.push({id:newId,icon:'💅',cat:'New Category',name:'Nai Service',desc:'Description',price:5000,dur:60});
+  saveServices(svcs);renderServices();toast('✓ Nai service add ho gayi — edit karein aur save karein');
+}
+
+// ---- BLOCK TIMES ----
+let tempBlocked=[];
+function loadBlockSlots(){
+  const date=document.getElementById('blockDateInput').value;
+  if(!date) return;
+  const map=getBlocked();
+  const bk=getBookings();
+  tempBlocked=[...(map[date]||[])];
+  const bookedByClients=bk.filter(b=>b.date===date&&b.status!=='Cancelled').map(b=>b.time);
+  document.getElementById('blockSlotsGrid').innerHTML=ALL_SLOTS.map(t=>{
+    const isClientBooked=bookedByClients.includes(t);
+    const isBlocked=tempBlocked.includes(t);
+    if(isClientBooked) return `<span class="slot-toggle booked-by-client" title="Client ne book kiya">${t} 👤</span>`;
+    return `<span class="slot-toggle ${isBlocked?'blocked':''}" onclick="toggleSlot('${t}',this)">${t}</span>`;
+  }).join('');
+}
+function toggleSlot(t,el){
+  if(tempBlocked.includes(t)){tempBlocked=tempBlocked.filter(x=>x!==t);el.classList.remove('blocked')}
+  else{tempBlocked.push(t);el.classList.add('blocked')}
+}
+function saveBlockedSlots(){
+  const date=document.getElementById('blockDateInput').value;
+  if(!date){toast('Tarikh chunein');return}
+  const map=getBlocked();map[date]=tempBlocked;saveBlocked(map);
+  toast('✓ Blocked times save ho gaye!');loadBlockedOverview();
+}
+function loadBlockedOverview(){
+  const map=getBlocked();
+  const keys=Object.keys(map).filter(k=>map[k].length>0).sort();
+  const el=document.getElementById('blockedOverview');
+  if(!keys.length){el.innerHTML='<div style="color:rgba(255,255,255,.3);font-size:13px">Koi blocked time nahi</div>';return}
+  el.innerHTML=keys.map(d=>`<div class="overview-item"><span class="overview-date">📅 ${d}</span><span class="overview-slots">${map[d].join(' · ')}</span><button class="act-btn danger" style="margin-left:auto;font-size:11px" onclick="clearDateBlock('${d}')">Clear</button></div>`).join('');
+}
+function clearDateBlock(date){
+  const map=getBlocked();delete map[date];saveBlocked(map);loadBlockedOverview();toast('✓ Clear ho gaya');
+}
+
+// ---- SETTINGS ----
+function loadSettings(){
+  const s=getSettings();
+  document.getElementById('set-name').value=s.name;
+  document.getElementById('set-phone').value=s.phone;
+  document.getElementById('set-addr').value=s.addr;
+}
+function saveSettings(){
+  saveSettingsData({name:document.getElementById('set-name').value,phone:document.getElementById('set-phone').value,addr:document.getElementById('set-addr').value});
+  toast('✓ Settings save ho gayi!');
+}
+function changePwd(){
+  const old=document.getElementById('oldPwd').value;
+  const n1=document.getElementById('newPwd').value;
+  const n2=document.getElementById('newPwd2').value;
+  const creds=getCreds();
+  if(old!==creds.pass){toast('❌ Purana password galat hai');return}
+  if(n1!==n2){toast('❌ Naya password match nahi karta');return}
+  if(n1.length<4){toast('❌ Password kam az kam 4 characters ka hona chahiye');return}
+  saveCreds({user:creds.user,pass:n1});
+  toast('✓ Password change ho gaya!');
+  document.getElementById('oldPwd').value='';document.getElementById('newPwd').value='';document.getElementById('newPwd2').value='';
+}
+function clearBookings(){if(!confirm('Saari bookings delete karein? Yeh undo nahi hoga!')) return;saveBookings([]);renderDashboard();toast('🗑 Saari bookings delete ho gayi')}
+function resetServices(){if(!confirm('Services reset karein?')) return;localStorage.removeItem('caviiServices');renderServices();toast('✓ Services reset ho gayi')}
+</script>
+</body>
+</html>
