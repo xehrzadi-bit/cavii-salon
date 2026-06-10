@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cavii Salon & Parlor — Book Your Session</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400&family=Cormorant+Garamond:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --rose: #c8295a;
+  --rose-deep: #8b1a3d;
+  --rose-light: #f7e0e8;
+  --gold: #c9973e;
+  --gold-light: #f5e6cc;
+  --cream: #fdf6f0;
+  --dark: #1a0a0f;
+  --dark2: #2d1520;
+  --text: #3d1a27;
+  --muted: #7a5060;
+  --white: #ffffff;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--cream);color:var(--text);overflow-x:hidden}
+
+.cursor{width:12px;height:12px;background:var(--rose);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transition:transform .15s ease;mix-blend-mode:multiply}
+.cursor-ring{width:36px;height:36px;border:1.5px solid var(--rose);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transition:all .3s cubic-bezier(.23,1,.32,1);opacity:.6}
+
+#particles{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:hidden}
+.petal{position:absolute;opacity:0;animation:fall linear infinite}
+@keyframes fall{0%{opacity:0;transform:translateY(-20px) rotate(0deg)}10%{opacity:.6}90%{opacity:.3}100%{opacity:0;transform:translateY(105vh) rotate(360deg)}}
+
+/* NAVBAR */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:18px 5%;display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(20px);background:rgba(253,246,240,.9);border-bottom:1px solid rgba(200,41,90,.12);transition:all .3s}
+.nav-logo{font-family:'Playfair Display',serif;font-size:22px;color:var(--rose-deep);letter-spacing:1px}
+.nav-logo span{color:var(--gold);font-style:italic}
+.nav-links{display:flex;gap:28px;list-style:none}
+.nav-links a{text-decoration:none;color:var(--muted);font-size:14px;font-weight:500;letter-spacing:.5px;transition:color .2s;position:relative}
+.nav-links a::after{content:'';position:absolute;bottom:-4px;left:0;width:0;height:1.5px;background:var(--rose);transition:width .3s}
+.nav-links a:hover{color:var(--rose)}
+.nav-links a:hover::after{width:100%}
+.nav-right{display:flex;align-items:center;gap:10px}
+.admin-link{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold);padding:9px 18px;border-radius:30px;font-size:13px;font-weight:500;cursor:pointer;text-decoration:none;transition:all .3s}
+.admin-link:hover{background:var(--gold);color:#fff}
+.nav-btn{background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;border:none;padding:10px 22px;border-radius:30px;font-size:13px;font-weight:500;cursor:pointer;letter-spacing:.5px;transition:all .3s;box-shadow:0 4px 20px rgba(200,41,90,.3)}
+.nav-btn:hover{transform:translateY(-2px);box-shadow:0 8px 30px rgba(200,41,90,.4)}
+
+/* CART ICON */
+.cart-icon-btn{position:relative;background:var(--rose-light);border:1.5px solid rgba(200,41,90,.25);color:var(--rose);padding:9px 18px;border-radius:30px;font-size:13px;font-weight:500;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:6px}
+.cart-icon-btn:hover{background:var(--rose);color:#fff}
+.cart-count{background:var(--rose);color:#fff;width:18px;height:18px;border-radius:50%;font-size:11px;display:flex;align-items:center;justify-content:center;font-weight:700;transition:transform .2s}
+.cart-count.bump{transform:scale(1.4)}
+
+/* HERO */
+.hero{min-height:100vh;display:flex;align-items:center;position:relative;padding:120px 5% 80px;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background:linear-gradient(135deg,#fdf6f0 0%,#f9eaf0 50%,#fdf0e6 100%);z-index:1}
+.hero-decor{position:absolute;right:-100px;top:50%;transform:translateY(-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(200,41,90,.08) 0%,transparent 70%);border-radius:50%;z-index:1}
+.hero-ring{position:absolute;right:5%;top:50%;transform:translateY(-50%);width:450px;height:450px;border:1px solid rgba(200,41,90,.15);border-radius:50%;animation:spin 20s linear infinite;z-index:1}
+.hero-ring::before{content:'';position:absolute;top:20px;left:20px;right:20px;bottom:20px;border:1px dashed rgba(201,151,62,.2);border-radius:50%}
+@keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
+.hero-content{position:relative;z-index:2;max-width:600px}
+.hero-badge{display:inline-flex;align-items:center;gap:8px;background:var(--rose-light);color:var(--rose);padding:8px 18px;border-radius:30px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;animation:slideDown .8s ease both}
+@keyframes slideDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(42px,6vw,72px);line-height:1.1;color:var(--dark);margin-bottom:20px;animation:slideUp 1s ease .2s both}
+.hero h1 em{color:var(--rose);font-style:italic}
+.hero h1 span{color:var(--gold)}
+@keyframes slideUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero p{font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--muted);line-height:1.7;margin-bottom:40px;animation:slideUp 1s ease .4s both}
+.hero-btns{display:flex;gap:16px;flex-wrap:wrap;animation:slideUp 1s ease .6s both}
+.btn-primary{background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;border:none;padding:16px 36px;border-radius:40px;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.5px;transition:all .3s;box-shadow:0 8px 30px rgba(200,41,90,.35)}
+.btn-primary:hover{transform:translateY(-3px);box-shadow:0 16px 40px rgba(200,41,90,.45)}
+.btn-secondary{background:transparent;color:var(--rose);border:1.5px solid var(--rose);padding:16px 36px;border-radius:40px;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.5px;transition:all .3s}
+.btn-secondary:hover{background:var(--rose);color:#fff}
+.hero-stats{display:flex;gap:40px;margin-top:60px;animation:slideUp 1s ease .8s both}
+.stat{text-align:center}
+.stat-num{font-family:'Playfair Display',serif;font-size:32px;color:var(--rose);font-weight:700}
+.stat-label{font-size:12px;color:var(--muted);letter-spacing:.5px;text-transform:uppercase;margin-top:4px}
+
+/* MARQUEE */
+.marquee-wrap{background:linear-gradient(90deg,var(--rose-deep),var(--dark2));padding:14px 0;overflow:hidden;position:relative;z-index:5}
+.marquee{display:flex;gap:40px;white-space:nowrap;animation:marquee 25s linear infinite}
+@keyframes marquee{to{transform:translateX(-50%)}}
+.marquee-item{color:rgba(255,255,255,.7);font-size:13px;letter-spacing:2px;text-transform:uppercase;display:flex;align-items:center;gap:16px}
+.marquee-dot{width:5px;height:5px;background:var(--gold);border-radius:50%}
+
+/* SERVICES SECTION */
+.section{padding:100px 5%;position:relative;z-index:2}
+.section-header{text-align:center;margin-bottom:60px}
+.section-tag{display:inline-block;background:var(--rose-light);color:var(--rose);padding:6px 18px;border-radius:20px;font-size:12px;font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:16px}
+.section-title{font-family:'Playfair Display',serif;font-size:clamp(32px,5vw,52px);color:var(--dark);margin-bottom:16px}
+.section-title em{color:var(--rose);font-style:italic}
+.section-sub{font-family:'Cormorant Garamond',serif;font-size:19px;color:var(--muted);max-width:500px;margin:0 auto}
+
+.services-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:24px}
+.service-card{background:#fff;border-radius:20px;padding:28px;border:1px solid rgba(200,41,90,.08);transition:all .4s cubic-bezier(.23,1,.32,1);cursor:pointer;position:relative;overflow:hidden}
+.service-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(200,41,90,.03),transparent);opacity:0;transition:opacity .3s}
+.service-card:hover{transform:translateY(-6px);box-shadow:0 20px 60px rgba(200,41,90,.15);border-color:rgba(200,41,90,.2)}
+.service-card:hover::before{opacity:1}
+.service-card.in-cart{border:2px solid var(--rose);background:#fff9fb}
+.service-icon{width:56px;height:56px;background:var(--rose-light);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:18px;transition:transform .3s}
+.service-card:hover .service-icon{transform:scale(1.1) rotate(5deg)}
+.service-cat{font-size:11px;color:var(--gold);font-weight:500;letter-spacing:1px;text-transform:uppercase;margin-bottom:8px}
+.service-name{font-family:'Playfair Display',serif;font-size:20px;color:var(--dark);margin-bottom:10px}
+.service-desc{font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:18px}
+.service-footer{display:flex;align-items:center;justify-content:space-between}
+.service-price{font-family:'Playfair Display',serif;font-size:22px;color:var(--rose);font-weight:600}
+.service-dur{font-size:12px;color:var(--muted);background:var(--cream);padding:4px 10px;border-radius:10px}
+.add-to-cart-btn{position:absolute;bottom:20px;right:20px;background:var(--rose);color:#fff;border:none;font-size:12px;padding:7px 14px;border-radius:20px;cursor:pointer;opacity:0;transform:translateY(5px);transition:all .3s;font-family:'DM Sans',sans-serif;font-weight:500}
+.service-card:hover .add-to-cart-btn{opacity:1;transform:translateY(0)}
+.add-to-cart-btn.added{background:#4caf50}
+.in-cart-badge{position:absolute;top:16px;right:16px;background:var(--rose);color:#fff;font-size:10px;padding:4px 10px;border-radius:10px;font-weight:600}
+
+/* CART DRAWER */
+.cart-overlay{position:fixed;inset:0;background:rgba(26,10,15,.6);z-index:150;display:none;backdrop-filter:blur(6px)}
+.cart-overlay.open{display:block}
+.cart-drawer{position:fixed;top:0;right:0;width:420px;max-width:100vw;height:100%;background:var(--white);z-index:151;transform:translateX(100%);transition:transform .4s cubic-bezier(.23,1,.32,1);display:flex;flex-direction:column;box-shadow:-20px 0 60px rgba(26,10,15,.2)}
+.cart-drawer.open{transform:translateX(0)}
+.cart-header{padding:28px 24px 20px;border-bottom:1px solid rgba(200,41,90,.1);display:flex;align-items:center;justify-content:space-between}
+.cart-header h3{font-family:'Playfair Display',serif;font-size:22px;color:var(--dark)}
+.cart-close{background:none;border:none;font-size:22px;cursor:pointer;color:var(--muted);transition:color .2s;line-height:1}
+.cart-close:hover{color:var(--rose)}
+.cart-body{flex:1;overflow-y:auto;padding:20px 24px}
+.cart-empty{text-align:center;padding:60px 20px;color:var(--muted)}
+.cart-empty-icon{font-size:48px;margin-bottom:16px}
+.cart-empty p{font-family:'Cormorant Garamond',serif;font-size:18px}
+.cart-item{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid rgba(200,41,90,.06)}
+.cart-item-icon{width:44px;height:44px;background:var(--rose-light);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0}
+.cart-item-info{flex:1}
+.cart-item-name{font-size:14px;font-weight:600;color:var(--dark);margin-bottom:2px}
+.cart-item-price{font-size:13px;color:var(--rose);font-weight:600}
+.cart-item-dur{font-size:11px;color:var(--muted)}
+.cart-remove{background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;transition:color .2s;padding:4px}
+.cart-remove:hover{color:#e53935}
+.cart-footer{padding:20px 24px;border-top:1px solid rgba(200,41,90,.1)}
+.cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.cart-total-label{font-size:13px;color:var(--muted)}
+.cart-total-dur{font-size:13px;color:var(--muted)}
+.cart-total-amount{font-family:'Playfair Display',serif;font-size:26px;color:var(--rose);font-weight:700}
+.cart-checkout-btn{width:100%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;margin-top:14px;letter-spacing:.5px;transition:all .3s;box-shadow:0 6px 20px rgba(200,41,90,.3)}
+.cart-checkout-btn:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(200,41,90,.4)}
+.cart-checkout-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+
+/* BOOKING SECTION */
+#booking{background:linear-gradient(135deg,var(--dark) 0%,var(--dark2) 100%);padding:100px 5%}
+.booking-wrap{max-width:960px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:start}
+.booking-info{color:#fff}
+.booking-info .section-tag{background:rgba(200,41,90,.2);color:#f7a0b8}
+.booking-info h2{font-family:'Playfair Display',serif;font-size:42px;color:#fff;margin:16px 0 24px;line-height:1.2}
+.booking-info h2 em{color:var(--gold);font-style:italic}
+.booking-info p{font-family:'Cormorant Garamond',serif;font-size:18px;color:rgba(255,255,255,.6);line-height:1.8;margin-bottom:32px}
+.booking-feature{display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.booking-feature-icon{width:40px;height:40px;background:rgba(200,41,90,.15);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0}
+.booking-feature-text{font-size:14px;color:rgba(255,255,255,.75)}
+
+.booking-form{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:24px;padding:36px;backdrop-filter:blur(20px)}
+.form-title{font-family:'Playfair Display',serif;font-size:22px;color:#fff;margin-bottom:24px;text-align:center}
+.form-group{margin-bottom:18px}
+.form-label{display:block;font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px}
+.form-input{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:12px;padding:13px 16px;color:#fff;font-size:14px;font-family:'DM Sans',sans-serif;transition:all .3s;outline:none}
+.form-input:focus{border-color:rgba(200,41,90,.5);background:rgba(200,41,90,.05);box-shadow:0 0 0 3px rgba(200,41,90,.1)}
+.form-input option{background:#1a0a0f;color:#fff}
+.form-input::placeholder{color:rgba(255,255,255,.3)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+/* CART SUMMARY IN BOOKING */
+.cart-summary-box{background:rgba(200,41,90,.08);border:1px solid rgba(200,41,90,.2);border-radius:14px;padding:16px;margin-bottom:18px}
+.cart-summary-title{font-size:12px;color:rgba(255,255,255,.5);letter-spacing:.8px;text-transform:uppercase;margin-bottom:10px}
+.cart-summary-item{display:flex;justify-content:space-between;font-size:13px;color:rgba(255,255,255,.8);margin-bottom:6px}
+.cart-summary-total{display:flex;justify-content:space-between;border-top:1px solid rgba(200,41,90,.2);padding-top:10px;margin-top:6px}
+.cart-summary-total span:first-child{font-size:13px;color:rgba(255,255,255,.6)}
+.cart-summary-total span:last-child{font-family:'Playfair Display',serif;font-size:18px;color:var(--rose);font-weight:700}
+.no-cart-msg{font-size:13px;color:rgba(255,255,255,.4);text-align:center;padding:12px;font-style:italic}
+
+/* TIME SLOTS */
+.time-slots-wrap{margin-bottom:18px}
+.time-slots-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:8px}
+.time-slot{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.15);border-radius:10px;padding:10px 6px;text-align:center;cursor:pointer;transition:all .3s;font-size:13px;color:rgba(255,255,255,.8);position:relative}
+.time-slot:hover:not(.booked){background:rgba(200,41,90,.15);border-color:rgba(200,41,90,.4)}
+.time-slot.selected{background:var(--rose);border-color:var(--rose);color:#fff}
+.time-slot.booked{background:rgba(255,255,255,.03);border-color:rgba(255,255,255,.06);color:rgba(255,255,255,.2);cursor:not-allowed;position:relative}
+.time-slot.booked::after{content:'Booked';position:absolute;bottom:3px;left:50%;transform:translateX(-50%);font-size:9px;color:rgba(200,41,90,.6);letter-spacing:.5px}
+.time-slots-note{font-size:11px;color:rgba(255,255,255,.35);margin-top:8px;text-align:center}
+
+.submit-btn{width:100%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));color:#fff;border:none;padding:16px;border-radius:14px;font-size:15px;font-weight:500;cursor:pointer;letter-spacing:.5px;transition:all .3s;margin-top:4px;position:relative;overflow:hidden}
+.submit-btn::before{content:'';position:absolute;top:50%;left:50%;width:0;height:0;background:rgba(255,255,255,.15);border-radius:50%;transform:translate(-50%,-50%);transition:all .5s}
+.submit-btn:hover::before{width:300px;height:300px}
+.submit-btn:hover{box-shadow:0 8px 30px rgba(200,41,90,.5)}
+.submit-btn:disabled{opacity:.5;cursor:not-allowed}
+
+/* SUCCESS OVERLAY */
+.success-overlay{display:none;position:fixed;inset:0;background:rgba(26,10,15,.9);z-index:200;align-items:center;justify-content:center;backdrop-filter:blur(10px)}
+.success-overlay.show{display:flex}
+.success-box{background:linear-gradient(135deg,#1a0a0f,#2d1520);border:1px solid rgba(200,41,90,.3);border-radius:28px;padding:48px 40px;text-align:center;max-width:460px;width:90%;animation:popIn .5s cubic-bezier(.23,1,.32,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:scale(1)}}
+.success-icon{font-size:60px;margin-bottom:16px;animation:bounce .6s ease .3s both}
+@keyframes bounce{from{transform:scale(0)}60%{transform:scale(1.2)}to{transform:scale(1)}}
+.success-box h3{font-family:'Playfair Display',serif;font-size:26px;color:#fff;margin-bottom:10px}
+.success-box p{font-family:'Cormorant Garamond',serif;font-size:17px;color:rgba(255,255,255,.6);line-height:1.7;margin-bottom:20px}
+.success-id{background:rgba(200,41,90,.15);border:1px solid rgba(200,41,90,.3);border-radius:10px;padding:10px 24px;display:inline-block;font-family:monospace;font-size:18px;color:var(--rose);letter-spacing:3px;margin-bottom:16px}
+.success-services-list{background:rgba(255,255,255,.04);border-radius:12px;padding:14px;margin-bottom:20px;text-align:left}
+.success-services-list div{font-size:13px;color:rgba(255,255,255,.6);padding:3px 0;display:flex;justify-content:space-between}
+.close-success{background:var(--rose);color:#fff;border:none;padding:14px 36px;border-radius:30px;font-size:14px;font-weight:500;cursor:pointer;transition:all .3s}
+
+/* TESTIMONIALS */
+.testimonials{background:#fff;padding:100px 5%}
+.testi-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;max-width:1100px;margin:0 auto}
+.testi-card{background:var(--cream);border-radius:20px;padding:28px;position:relative;border:1px solid rgba(200,41,90,.06)}
+.testi-quote{font-size:40px;color:var(--rose-light);font-family:'Playfair Display',serif;line-height:1;margin-bottom:12px}
+.testi-text{font-family:'Cormorant Garamond',serif;font-size:17px;color:var(--muted);line-height:1.8;margin-bottom:20px}
+.testi-author{display:flex;align-items:center;gap:12px}
+.testi-avatar{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--rose),var(--rose-deep));display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:600}
+.testi-name{font-size:14px;font-weight:500;color:var(--dark)}
+.testi-stars{color:var(--gold);font-size:12px;margin-top:2px}
+
+footer{background:var(--dark);color:rgba(255,255,255,.6);padding:60px 5% 30px;text-align:center}
+.footer-logo{font-family:'Playfair Display',serif;font-size:28px;color:#fff;margin-bottom:16px}
+.footer-logo em{color:var(--rose);font-style:italic}
+.footer-tagline{font-family:'Cormorant Garamond',serif;font-size:17px;margin-bottom:40px;opacity:.7}
+.footer-links{display:flex;justify-content:center;gap:32px;flex-wrap:wrap;margin-bottom:40px}
+.footer-links a{color:rgba(255,255,255,.5);text-decoration:none;font-size:13px;letter-spacing:.5px;transition:color .2s}
+.footer-links a:hover{color:var(--rose)}
+.footer-divider{border:none;border-top:1px solid rgba(255,255,255,.08);margin:0 0 24px}
+.footer-bottom{font-size:12px;opacity:.4}
+
+.reveal{opacity:0;transform:translateY(30px);transition:all .8s cubic-bezier(.23,1,.32,1)}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-left{opacity:0;transform:translateX(-30px);transition:all .8s cubic-bezier(.23,1,.32,1)}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(30px);transition:all .8s cubic-bezier(.23,1,.32,1)}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+.float{animation:floating 3s ease-in-out infinite}
+@keyframes floating{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+
+.wa-btn{position:fixed;bottom:30px;right:30px;width:56px;height:56px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 8px 25px rgba(37,211,102,.4);cursor:pointer;z-index:50;transition:all .3s;text-decoration:none}
+.wa-btn:hover{transform:scale(1.1)}
+.wa-pulse{position:absolute;width:100%;height:100%;background:#25d366;border-radius:50%;animation:pulse 2s ease infinite}
+@keyframes pulse{0%{transform:scale(1);opacity:.7}100%{transform:scale(1.6);opacity:0}}
+.scroll-top{position:fixed;bottom:96px;right:30px;width:44px;height:44px;background:var(--rose);border-radius:50%;border:none;color:#fff;font-size:18px;cursor:pointer;z-index:50;transition:all .3s;opacity:0;transform:translateY(10px)}
+.scroll-top.visible{opacity:1;transform:translateY(0)}
+
+/* ADMIN */
+#adminPanel{display:none;position:fixed;inset:0;background:rgba(26,10,15,.95);z-index:300;overflow-y:auto;padding:40px 5%}
+#adminPanel.open{display:block}
+.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:32px}
+.admin-header h2{font-family:'Playfair Display',serif;font-size:28px;color:#fff}
+.admin-close{background:rgba(200,41,90,.2);border:1px solid rgba(200,41,90,.3);color:#fff;padding:10px 20px;border-radius:20px;cursor:pointer;font-size:14px;transition:all .3s}
+.admin-close:hover{background:var(--rose)}
+.admin-tabs{display:flex;gap:12px;margin-bottom:28px;flex-wrap:wrap}
+.admin-tab{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);padding:10px 22px;border-radius:20px;cursor:pointer;font-size:13px;transition:all .3s}
+.admin-tab.active{background:var(--rose);border-color:var(--rose);color:#fff}
+.admin-section{display:none}
+.admin-section.active{display:block}
+.bookings-table{width:100%;border-collapse:collapse;font-size:13px}
+.bookings-table th{text-align:left;padding:12px 16px;color:rgba(255,255,255,.4);font-size:11px;letter-spacing:.8px;text-transform:uppercase;border-bottom:1px solid rgba(255,255,255,.08)}
+.bookings-table td{padding:14px 16px;color:rgba(255,255,255,.8);border-bottom:1px solid rgba(255,255,255,.05);vertical-align:top}
+.status-badge{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600}
+.status-pending{background:rgba(201,151,62,.15);color:#f0b862}
+.status-confirmed{background:rgba(76,175,80,.15);color:#81c784}
+.status-cancelled{background:rgba(200,41,90,.15);color:#f48fb1}
+.admin-action-btn{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.1);color:#fff;padding:5px 12px;border-radius:10px;cursor:pointer;font-size:11px;margin-right:4px;transition:all .2s}
+.admin-action-btn:hover{background:var(--rose);border-color:var(--rose)}
+.services-admin-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px}
+.service-admin-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px}
+.service-admin-card input,.service-admin-card textarea,.service-admin-card select{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:8px 12px;color:#fff;font-size:13px;font-family:'DM Sans',sans-serif;margin-bottom:8px;outline:none}
+.service-admin-card input:focus,.service-admin-card select:focus{border-color:rgba(200,41,90,.4)}
+.save-service-btn{background:var(--rose);color:#fff;border:none;padding:8px 18px;border-radius:10px;cursor:pointer;font-size:12px;transition:all .2s}
+.save-service-btn:hover{background:var(--rose-deep)}
+.add-service-btn{background:rgba(201,151,62,.15);border:1px dashed rgba(201,151,62,.4);color:var(--gold);border-radius:16px;padding:20px;text-align:center;cursor:pointer;font-size:14px;transition:all .3s}
+.add-service-btn:hover{background:rgba(201,151,62,.2)}
+.delete-service-btn{background:rgba(200,41,90,.1);border:1px solid rgba(200,41,90,.2);color:rgba(200,41,90,.8);padding:5px 12px;border-radius:8px;cursor:pointer;font-size:11px;transition:all .2s;float:right;margin-top:4px}
+.delete-service-btn:hover{background:var(--rose);color:#fff;border-color:var(--rose)}
+.blocked-times-section{background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px;margin-bottom:20px}
+.blocked-times-section h4{color:#fff;font-size:15px;margin-bottom:16px}
+.blocked-day-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;flex-wrap:wrap}
+.blocked-day-label{color:rgba(255,255,255,.6);font-size:13px;width:80px;flex-shrink:0}
+.time-toggle-grid{display:flex;gap:6px;flex-wrap:wrap}
+.time-toggle{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.6);padding:5px 10px;border-radius:8px;cursor:pointer;font-size:12px;transition:all .2s}
+.time-toggle.blocked{background:rgba(200,41,90,.2);border-color:rgba(200,41,90,.4);color:#f48fb1}
+.time-toggle:hover{border-color:rgba(200,41,90,.4)}
+
+.stats-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:14px;margin-bottom:28px}
+.stat-card{background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:20px;text-align:center}
+.stat-card-num{font-family:'Playfair Display',serif;font-size:28px;color:var(--rose);margin-bottom:4px}
+.stat-card-label{font-size:12px;color:rgba(255,255,255,.4);letter-spacing:.5px;text-transform:uppercase}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+  .booking-wrap{grid-template-columns:1fr}
+  .hero-stats{gap:20px}
+  .hero-ring{display:none}
+  .form-row{grid-template-columns:1fr}
+  .cart-drawer{width:100vw}
+  .time-slots-grid{grid-template-columns:repeat(3,1fr)}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+<div id="particles"></div>
+
+<!-- NAVBAR -->
+<nav>
+  <div class="nav-logo">Cavii<span>✦</span></div>
+  <ul class="nav-links">
+    <li><a href="#services">Services</a></li>
+    <li><a href="#booking">Book Now</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="cart-icon-btn" onclick="openCart()">
+      🛒 Cart <div class="cart-count" id="cartCount">0</div>
+    </button>
+    <button class="admin-link" onclick="openAdmin()">⚙ Admin</button>
+    <button class="nav-btn" onclick="scrollTo({top:document.getElementById('booking').offsetTop,behavior:'smooth'})">Book Now</button>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-decor"></div>
+  <div class="hero-ring float"></div>
+  <div class="hero-content">
+    <div class="hero-badge">✦ Female Only Salon &amp; Parlor ✦</div>
+    <h1>Where Beauty<br>Meets <em>Elegance</em><br>&amp; <span>Luxury</span></h1>
+    <p>Faisalabad ki sab se premium ladies salon — keratin, PRP, laser, facials, makeup aur bohot kuch.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="scrollTo({top:document.getElementById('services').offsetTop,behavior:'smooth'})">✦ Services Dekhein</button>
+      <button class="btn-secondary" onclick="openCart()">🛒 Cart Dekhein</button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-num">500+</div><div class="stat-label">Happy Clients</div></div>
+      <div class="stat"><div class="stat-num">15+</div><div class="stat-label">Services</div></div>
+      <div class="stat"><div class="stat-num">5★</div><div class="stat-label">Rated</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee" id="marqueeInner"></div>
+</div>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-header reveal">
+    <div class="section-tag">Our Specialties</div>
+    <h2 class="section-title">Premium <em>Services</em></h2>
+    <p class="section-sub">Ek se zyada services cart mein add karein aur ek sath book karein</p>
+  </div>
+  <div class="services-grid" id="servicesGrid"></div>
+</section>
+
+<!-- BOOKING -->
+<section id="booking">
+  <div class="booking-wrap">
+    <div class="booking-info reveal-left">
+      <div class="section-tag">Online Booking</div>
+      <h2>Book Your<br><em>Session</em> Online</h2>
+      <p>Multiple services ek sath book karein. Jo time booked ho wo automatically blocked ho jata hai.</p>
+      <div class="booking-feature"><div class="booking-feature-icon">🛒</div><div class="booking-feature-text">Multiple services ek sath cart mein add karein</div></div>
+      <div class="booking-feature"><div class="booking-feature-icon">⏰</div><div class="booking-feature-text">Booked time slots automatically block ho jaate hain</div></div>
+      <div class="booking-feature"><div class="booking-feature-icon">🔔</div><div class="booking-feature-text">WhatsApp pe instant confirmation</div></div>
+      <div class="booking-feature"><div class="booking-feature-icon">👩</div><div class="booking-feature-text">Sirf females ke liye — 100% private</div></div>
+    </div>
+    <div class="booking-form reveal-right">
+      <div class="form-title">✦ Appointment Book Karein</div>
+      <div class="form-group">
+        <label class="form-label">Aapka Naam</label>
+        <input type="text" class="form-input" id="clientName" placeholder="Sara Ahmed">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone / WhatsApp</label>
+        <input type="text" class="form-input" id="clientPhone" placeholder="0300-1234567">
+      </div>
+      <!-- Cart Summary -->
+      <div class="form-group">
+        <label class="form-label">Selected Services</label>
+        <div class="cart-summary-box" id="bookingCartSummary">
+          <div class="no-cart-msg">Koi service select nahi ki. Pehle cart mein add karein ↑</div>
+        </div>
+      </div>
+      <!-- Date -->
+      <div class="form-group">
+        <label class="form-label">Tarikh</label>
+        <input type="date" class="form-input" id="clientDate" onchange="loadTimeSlots()">
+      </div>
+      <!-- Time Slots -->
+      <div class="time-slots-wrap form-group" id="timeSlotsWrap" style="display:none">
+        <label class="form-label">Waqt Chunein</label>
+        <div class="time-slots-grid" id="timeSlotsGrid"></div>
+        <div class="time-slots-note">🔴 Booked slots available nahi hain</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Koi Khaas Baat (Optional)</label>
+        <input type="text" class="form-input" id="clientNote" placeholder="Allergy, koi preference...">
+      </div>
+      <button class="submit-btn" id="submitBtn" onclick="submitBooking()">✦ Appointment Confirm Karein</button>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIALS -->
+<section class="testimonials" id="about">
+  <div class="section-header reveal">
+    <div class="section-tag">Client Love</div>
+    <h2 class="section-title">Hamari <em>Clients</em> Kehti Hain</h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card reveal"><div class="testi-quote">"</div><div class="testi-text">Keratin treatment ke baad mere baalon ki zindagi badal gayi! Cavii ki beauticians bohot professional hain.</div><div class="testi-author"><div class="testi-avatar">SA</div><div><div class="testi-name">Sara Ahmed</div><div class="testi-stars">★★★★★</div></div></div></div>
+    <div class="testi-card reveal" style="transition-delay:.1s"><div class="testi-quote">"</div><div class="testi-text">PRP treatment aur hydra facial dono karwaye — skin ekdam glow kar rahi hai. Best salon in Faisalabad!</div><div class="testi-author"><div class="testi-avatar">FQ</div><div><div class="testi-name">Fatima Qadir</div><div class="testi-stars">★★★★★</div></div></div></div>
+    <div class="testi-card reveal" style="transition-delay:.2s"><div class="testi-quote">"</div><div class="testi-text">Bridal makeup itna beautiful tha. Online booking system bhi bohot convenient hai — ekdum easy!</div><div class="testi-author"><div class="testi-avatar">ZB</div><div><div class="testi-name">Zainab Butt</div><div class="testi-stars">★★★★★</div></div></div></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer id="contact">
+  <div class="footer-logo">Cavii <em>✦</em> Salon</div>
+  <div class="footer-tagline">Where Every Woman Deserves to Feel Like a Queen</div>
+  <div class="footer-links">
+    <a href="#">Home</a><a href="#services">Services</a><a href="#booking">Book Now</a>
+    <a href="#" onclick="openAdmin();return false">Admin Panel</a><a href="#">Privacy Policy</a>
+  </div>
+  <hr class="footer-divider">
+  <div class="footer-bottom">📍 Faisalabad, Punjab &nbsp;|&nbsp; 📞 0300-CAVII &nbsp;|&nbsp; © 2026 Cavii Salon. All rights reserved.</div>
+</footer>
+
+<!-- SUCCESS OVERLAY -->
+<div class="success-overlay" id="successOverlay">
+  <div class="success-box">
+    <div class="success-icon">✨</div>
+    <h3>Appointment Confirm!</h3>
+    <p>Aapka appointment successfully book ho gaya hai.</p>
+    <div class="success-id" id="bookingId">CVA-0000</div>
+    <div class="success-services-list" id="successServicesList"></div>
+    <button class="close-success" onclick="closeSuccess()">Shukriya ✦</button>
+  </div>
+</div>
+
+<!-- CART DRAWER -->
+<div class="cart-overlay" id="cartOverlay" onclick="closeCart()"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-header">
+    <h3>✦ Aapki Cart</h3>
+    <button class="cart-close" onclick="closeCart()">✕</button>
+  </div>
+  <div class="cart-body" id="cartBody">
+    <div class="cart-empty">
+      <div class="cart-empty-icon">🛒</div>
+      <p>Cart khali hai. Services dekhein aur add karein.</p>
+    </div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total-row">
+      <span class="cart-total-label">Total Amount</span>
+      <span class="cart-total-amount" id="cartTotal">₨0</span>
+    </div>
+    <div class="cart-total-row">
+      <span class="cart-total-dur">Total Time</span>
+      <span style="font-size:13px;color:var(--muted)" id="cartDur">0 min</span>
+    </div>
+    <button class="cart-checkout-btn" onclick="goToBooking()">✦ Appointment Book Karein</button>
+  </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="adminPanel">
+  <div class="admin-header">
+    <h2>⚙ Cavii Admin Panel</h2>
+    <button class="admin-close" onclick="closeAdmin()">✕ Close</button>
+  </div>
+  <div class="stats-grid" id="adminStats"></div>
+  <div class="admin-tabs">
+    <button class="admin-tab active" onclick="switchTab('bookings')">📋 Bookings</button>
+    <button class="admin-tab" onclick="switchTab('services')">✂ Services</button>
+    <button class="admin-tab" onclick="switchTab('blocked')">⏰ Block Times</button>
+  </div>
+  <div id="tab-bookings" class="admin-section active">
+    <table class="bookings-table" id="bookingsTable">
+      <thead><tr><th>ID</th><th>Client</th><th>Services</th><th>Date & Time</th><th>Total</th><th>Status</th><th>Actions</th></tr></thead>
+      <tbody id="bookingsBody"></tbody>
+    </table>
+  </div>
+  <div id="tab-services" class="admin-section">
+    <div class="services-admin-grid" id="servicesAdminGrid"></div>
+  </div>
+  <div id="tab-blocked" class="admin-section">
+    <div class="blocked-times-section">
+      <h4>📅 Date ke hisaab se times block karein</h4>
+      <div class="form-group" style="margin-bottom:16px">
+        <label class="form-label" style="color:rgba(255,255,255,.5)">Tarikh Chunein</label>
+        <input type="date" class="form-input" id="blockDate" onchange="loadBlockedTimes()" style="max-width:200px">
+      </div>
+      <div id="blockTimesGrid"></div>
+      <button onclick="saveBlockedTimes()" style="background:var(--rose);color:#fff;border:none;padding:10px 24px;border-radius:10px;cursor:pointer;font-size:13px;margin-top:12px">💾 Save Block Times</button>
+    </div>
+    <div class="blocked-times-section">
+      <h4>📋 Blocked Dates Overview</h4>
+      <div id="blockedOverview" style="font-size:13px;color:rgba(255,255,255,.5)">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<a class="wa-btn" href="https://wa.me/923001234567" target="_blank">
+  <div class="wa-pulse"></div>💬
+</a>
+<button class="scroll-top" id="scrollTop" onclick="window.scrollTo({top:0,behavior:'smooth'})">↑</button>
+
+<script>
+// ======== DATA ========
+const DEFAULT_SERVICES = [
+  {id:1,icon:'💆',cat:'Hair Treatment',name:'Keratin Treatment',desc:'Smooth, frizz-free silky hair for weeks.',price:8000,dur:120},
+  {id:2,icon:'🌊',cat:'Hair Treatment',name:'Hair Spa',desc:'Deep nourishment & scalp healing therapy.',price:4500,dur:90},
+  {id:3,icon:'💉',cat:'Hair Treatment',name:'Hair PRP',desc:'Platelet-rich plasma for hair regrowth.',price:12000,dur:90},
+  {id:4,icon:'✨',cat:'Skin Treatment',name:'Hydra Facial',desc:'Deep hydration & skin brightening treatment.',price:5500,dur:60},
+  {id:5,icon:'🔬',cat:'Skin Treatment',name:'Skin PRP',desc:'Anti-aging & skin rejuvenation therapy.',price:15000,dur:60},
+  {id:6,icon:'🪡',cat:'Skin Treatment',name:'Microneedling',desc:'Collagen induction for younger looking skin.',price:7000,dur:60},
+  {id:7,icon:'💊',cat:'Skin Treatment',name:'Whitening Injection',desc:'Glutathione for skin brightening & glow.',price:10000,dur:45},
+  {id:8,icon:'⚡',cat:'Laser & Wax',name:'Laser Hair Removal',desc:'Permanent hair removal with advanced laser.',price:9000,dur:45},
+  {id:9,icon:'🕯️',cat:'Laser & Wax',name:'Full Body Waxing',desc:'Smooth skin with premium quality wax.',price:3500,dur:60},
+  {id:10,icon:'💄',cat:'Makeup',name:'Bridal Makeup',desc:'Complete bridal look with HD coverage.',price:25000,dur:180},
+  {id:11,icon:'🌟',cat:'Makeup',name:'Party Makeup',desc:'Glamorous party-ready look by experts.',price:6000,dur:90},
+  {id:12,icon:'🧖',cat:'Facial',name:'Glow Facial',desc:'Vitamin C & gold brightening facial.',price:3500,dur:60},
+];
+
+const ALL_SLOTS = ['09:00 AM','10:00 AM','11:00 AM','12:00 PM','01:00 PM','02:00 PM','03:00 PM','04:00 PM','05:00 PM','06:00 PM','07:00 PM'];
+
+function getServices(){return JSON.parse(localStorage.getItem('caviiServices')||'null')||DEFAULT_SERVICES}
+function saveServices(s){localStorage.setItem('caviiServices',JSON.stringify(s))}
+function getBookings(){return JSON.parse(localStorage.getItem('caviiBookings')||'[]')}
+function saveBookings(b){localStorage.setItem('caviiBookings',JSON.stringify(b))}
+function getBlockedMap(){return JSON.parse(localStorage.getItem('caviiBlocked')||'{}')}
+function saveBlockedMap(m){localStorage.setItem('caviiBlocked',JSON.stringify(m))}
+
+// ======== CART ========
+let cart = [];
+
+function addToCart(id){
+  const svcs = getServices();
+  const s = svcs.find(x=>x.id===id);
+  if(!s) return;
+  if(cart.find(x=>x.id===id)){
+    removeFromCart(id);
+    return;
+  }
+  cart.push({...s});
+  updateCartUI();
+  renderServices();
+  bumpCartCount();
+}
+
+function removeFromCart(id){
+  cart = cart.filter(x=>x.id!==id);
+  updateCartUI();
+  renderServices();
+  updateBookingCartSummary();
+}
+
+function bumpCartCount(){
+  const el = document.getElementById('cartCount');
+  el.classList.add('bump');
+  setTimeout(()=>el.classList.remove('bump'),300);
+}
+
+function updateCartUI(){
+  const countEl = document.getElementById('cartCount');
+  countEl.textContent = cart.length;
+  const body = document.getElementById('cartBody');
+  const footer = document.getElementById('cartFooter');
+  if(cart.length===0){
+    body.innerHTML = `<div class="cart-empty"><div class="cart-empty-icon">🛒</div><p>Cart khali hai. Services dekhein aur add karein.</p></div>`;
+    footer.style.display='none';
+    return;
+  }
+  footer.style.display='block';
+  let html='';
+  cart.forEach(s=>{
+    html+=`<div class="cart-item">
+      <div class="cart-item-icon">${s.icon}</div>
+      <div class="cart-item-info">
+        <div class="cart-item-name">${s.name}</div>
+        <div class="cart-item-price">₨${s.price.toLocaleString()}</div>
+        <div class="cart-item-dur">⏱ ${formatDur(s.dur)}</div>
+      </div>
+      <button class="cart-remove" onclick="removeFromCart(${s.id})">✕</button>
+    </div>`;
+  });
+  body.innerHTML = html;
+  const total = cart.reduce((a,s)=>a+s.price,0);
+  const totalDur = cart.reduce((a,s)=>a+s.dur,0);
+  document.getElementById('cartTotal').textContent = '₨'+total.toLocaleString();
+  document.getElementById('cartDur').textContent = formatDur(totalDur);
+  updateBookingCartSummary();
+}
+
+function formatDur(min){
+  if(min<60) return min+'m';
+  const h=Math.floor(min/60), m=min%60;
+  return h+'h'+(m?(' '+m+'m'):'');
+}
+
+function openCart(){
+  document.getElementById('cartOverlay').classList.add('open');
+  document.getElementById('cartDrawer').classList.add('open');
+}
+function closeCart(){
+  document.getElementById('cartOverlay').classList.remove('open');
+  document.getElementById('cartDrawer').classList.remove('open');
+}
+function goToBooking(){
+  closeCart();
+  scrollTo({top:document.getElementById('booking').offsetTop,behavior:'smooth'});
+}
+
+// ======== BOOKING CART SUMMARY ========
+function updateBookingCartSummary(){
+  const box = document.getElementById('bookingCartSummary');
+  if(cart.length===0){
+    box.innerHTML = '<div class="no-cart-msg">Koi service select nahi ki. Pehle cart mein add karein ↑</div>';
+    return;
+  }
+  const total = cart.reduce((a,s)=>a+s.price,0);
+  const totalDur = cart.reduce((a,s)=>a+s.dur,0);
+  let html='<div class="cart-summary-title">Selected Services</div>';
+  cart.forEach(s=>{
+    html+=`<div class="cart-summary-item"><span>${s.icon} ${s.name}</span><span>₨${s.price.toLocaleString()}</span></div>`;
+  });
+  html+=`<div class="cart-summary-total"><span>Total (${formatDur(totalDur)})</span><span>₨${total.toLocaleString()}</span></div>`;
+  box.innerHTML = html;
+}
+
+// ======== TIME SLOTS ========
+let selectedTime = '';
+
+function loadTimeSlots(){
+  const date = document.getElementById('clientDate').value;
+  if(!date) return;
+  document.getElementById('timeSlotsWrap').style.display='block';
+  selectedTime = '';
+  renderTimeSlots(date);
+}
+
+function getBookedSlotsForDate(date){
+  const bookings = getBookings();
+  const blocked = getBlockedMap();
+  const bookedByAppointments = bookings.filter(b=>b.date===date && b.status!=='Cancelled').map(b=>b.time);
+  const manuallyBlocked = blocked[date]||[];
+  return [...new Set([...bookedByAppointments,...manuallyBlocked])];
+}
+
+function renderTimeSlots(date){
+  const booked = getBookedSlotsForDate(date);
+  const grid = document.getElementById('timeSlotsGrid');
+  grid.innerHTML = ALL_SLOTS.map(t=>{
+    const isBooked = booked.includes(t);
+    const isSelected = t===selectedTime;
+    return `<div class="time-slot ${isBooked?'booked':''} ${isSelected?'selected':''}" 
+      onclick="${isBooked?'':'selectTime(\''+t+'\')'}" data-time="${t}">${t}</div>`;
+  }).join('');
+}
+
+function selectTime(t){
+  selectedTime = t;
+  const date = document.getElementById('clientDate').value;
+  renderTimeSlots(date);
+}
+
+// ======== BOOKING SUBMIT ========
+function submitBooking(){
+  const name = document.getElementById('clientName').value.trim();
+  const phone = document.getElementById('clientPhone').value.trim();
+  const date = document.getElementById('clientDate').value;
+  if(!name){alert('Naam likhein');return}
+  if(!phone){alert('Phone number likhein');return}
+  if(cart.length===0){alert('Koi service select nahi ki. Cart mein service add karein.');return}
+  if(!date){alert('Tarikh chunein');return}
+  if(!selectedTime){alert('Waqt chunein');return}
+
+  const id = 'CVA-'+Math.floor(Math.random()*9000+1000);
+  const total = cart.reduce((a,s)=>a+s.price,0);
+  const services = cart.map(s=>s.name).join(', ');
+  const servicesArr = cart.map(s=>({name:s.name,price:s.price,dur:s.dur}));
+
+  const bookings = getBookings();
+  bookings.push({id,name,phone,services,servicesArr,total,date,time:selectedTime,note:document.getElementById('clientNote').value,status:'Pending',created:new Date().toISOString()});
+  saveBookings(bookings);
+
+  document.getElementById('bookingId').textContent = id;
+  let sl='';
+  servicesArr.forEach(s=>{sl+=`<div><span>${s.name}</span><span>₨${s.price.toLocaleString()}</span></div>`});
+  sl+=`<div style="border-top:1px solid rgba(200,41,90,.2);margin-top:8px;padding-top:8px"><span>Total</span><span style="color:var(--rose);font-weight:700">₨${total.toLocaleString()}</span></div>`;
+  document.getElementById('successServicesList').innerHTML = sl;
+  document.getElementById('successOverlay').classList.add('show');
+
+  // Reset
+  cart=[];
+  updateCartUI();
+  renderServices();
+  document.getElementById('clientName').value='';
+  document.getElementById('clientPhone').value='';
+  document.getElementById('clientNote').value='';
+  document.getElementById('clientDate').value='';
+  selectedTime='';
+  document.getElementById('timeSlotsWrap').style.display='none';
+  updateBookingCartSummary();
+}
+function closeSuccess(){document.getElementById('successOverlay').classList.remove('show')}
+
+// ======== RENDER SERVICES ========
+function renderServices(){
+  let svcs = getServices();
+  if(!localStorage.getItem('caviiServices')) saveServices(DEFAULT_SERVICES);
+  const grid = document.getElementById('servicesGrid');
+  grid.innerHTML = svcs.map((s,i)=>{
+    const inCart = cart.find(x=>x.id===s.id);
+    return `<div class="service-card reveal ${inCart?'in-cart':''}" style="transition-delay:${i*0.04}s">
+      ${inCart?'<div class="in-cart-badge">✓ Cart Mein</div>':''}
+      <div class="service-icon">${s.icon}</div>
+      <div class="service-cat">${s.cat}</div>
+      <div class="service-name">${s.name}</div>
+      <div class="service-desc">${s.desc}</div>
+      <div class="service-footer">
+        <div class="service-price">₨${s.price.toLocaleString()}</div>
+        <div class="service-dur">⏱ ${formatDur(s.dur)}</div>
+      </div>
+      <button class="add-to-cart-btn ${inCart?'added':''}" onclick="addToCart(${s.id});event.stopPropagation()">
+        ${inCart?'✓ Remove':'+ Cart'}
+      </button>
+    </div>`;
+  }).join('');
+  observeReveal();
+}
+
+// ======== ADMIN ========
+function openAdmin(){document.getElementById('adminPanel').classList.add('open');renderAdmin()}
+function closeAdmin(){document.getElementById('adminPanel').classList.remove('open')}
+
+function switchTab(name){
+  document.querySelectorAll('.admin-tab').forEach((t,i)=>t.classList.toggle('active',['bookings','services','blocked'][i]===name));
+  document.querySelectorAll('.admin-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+function renderAdmin(){
+  renderAdminStats();
+  renderAdminBookings();
+  renderAdminServices();
+}
+
+function renderAdminStats(){
+  const bookings = getBookings();
+  const total = bookings.reduce((a,b)=>a+(b.total||0),0);
+  const pending = bookings.filter(b=>b.status==='Pending').length;
+  const confirmed = bookings.filter(b=>b.status==='Confirmed').length;
+  document.getElementById('adminStats').innerHTML=`
+    <div class="stat-card"><div class="stat-card-num">${bookings.length}</div><div class="stat-card-label">Total Bookings</div></div>
+    <div class="stat-card"><div class="stat-card-num">${pending}</div><div class="stat-card-label">Pending</div></div>
+    <div class="stat-card"><div class="stat-card-num">${confirmed}</div><div class="stat-card-label">Confirmed</div></div>
+    <div class="stat-card"><div class="stat-card-num">₨${total.toLocaleString()}</div><div class="stat-card-label">Total Revenue</div></div>
+  `;
+}
+
+function renderAdminBookings(){
+  const bookings = getBookings();
+  const tbody = document.getElementById('bookingsBody');
+  if(bookings.length===0){tbody.innerHTML='<tr><td colspan="7" style="text-align:center;color:rgba(255,255,255,.3);padding:40px">Koi booking nahi abhi tak</td></tr>';return}
+  tbody.innerHTML = [...bookings].reverse().map(b=>`
+    <tr>
+      <td style="font-family:monospace;color:var(--rose)">${b.id}</td>
+      <td><div style="font-weight:600">${b.name}</div><div style="color:rgba(255,255,255,.4);font-size:12px">${b.phone}</div></td>
+      <td style="max-width:180px;font-size:12px">${b.services||b.service||''}</td>
+      <td><div>${b.date}</div><div style="color:rgba(255,255,255,.5);font-size:12px">${b.time}</div></td>
+      <td style="color:var(--gold);font-family:'Playfair Display',serif">₨${(b.total||0).toLocaleString()}</td>
+      <td><span class="status-badge status-${(b.status||'pending').toLowerCase()}">${b.status||'Pending'}</span></td>
+      <td>
+        <button class="admin-action-btn" onclick="updateStatus('${b.id}','Confirmed')">✓</button>
+        <button class="admin-action-btn" onclick="updateStatus('${b.id}','Cancelled')">✕</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function updateStatus(id, status){
+  const bookings = getBookings();
+  const b = bookings.find(x=>x.id===id);
+  if(b) b.status=status;
+  saveBookings(bookings);
+  renderAdminBookings();
+  renderAdminStats();
+}
+
+function renderAdminServices(){
+  const svcs = getServices();
+  const grid = document.getElementById('servicesAdminGrid');
+  grid.innerHTML = svcs.map(s=>`
+    <div class="service-admin-card" id="scard-${s.id}">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+        <span style="color:rgba(255,255,255,.5);font-size:12px">ID: ${s.id}</span>
+        <button class="delete-service-btn" onclick="deleteService(${s.id})">🗑 Delete</button>
+      </div>
+      <input value="${s.icon}" id="sicon-${s.id}" placeholder="Icon (emoji)">
+      <input value="${s.name}" id="sname-${s.id}" placeholder="Service Name">
+      <input value="${s.cat}" id="scat-${s.id}" placeholder="Category">
+      <input value="${s.desc}" id="sdesc-${s.id}" placeholder="Description">
+      <input type="number" value="${s.price}" id="sprice-${s.id}" placeholder="Price (Rs)">
+      <input type="number" value="${s.dur}" id="sdur-${s.id}" placeholder="Duration (minutes)">
+      <button class="save-service-btn" onclick="saveService(${s.id})">💾 Save</button>
+    </div>
+  `).join('')+`<div class="add-service-btn" onclick="addNewService()">+ Nai Service Add Karein</div>`;
+}
+
+function saveService(id){
+  const svcs = getServices();
+  const idx = svcs.findIndex(s=>s.id===id);
+  if(idx<0) return;
+  svcs[idx]={...svcs[idx],icon:document.getElementById('sicon-'+id).value,name:document.getElementById('sname-'+id).value,cat:document.getElementById('scat-'+id).value,desc:document.getElementById('sdesc-'+id).value,price:parseInt(document.getElementById('sprice-'+id).value)||0,dur:parseInt(document.getElementById('sdur-'+id).value)||60};
+  saveServices(svcs);
+  renderServices();
+  alert('✓ Service save ho gayi!');
+}
+
+function deleteService(id){
+  if(!confirm('Yeh service delete karein?')) return;
+  let svcs = getServices();
+  svcs = svcs.filter(s=>s.id!==id);
+  saveServices(svcs);
+  renderAdminServices();
+  renderServices();
+}
+
+function addNewService(){
+  const svcs = getServices();
+  const newId = Math.max(...svcs.map(s=>s.id),0)+1;
+  svcs.push({id:newId,icon:'💅',cat:'New Category',name:'Nai Service',desc:'Description likhein',price:5000,dur:60});
+  saveServices(svcs);
+  renderAdminServices();
+  renderServices();
+}
+
+// ======== BLOCK TIMES ========
+let tempBlockedForDate = [];
+
+function loadBlockedTimes(){
+  const date = document.getElementById('blockDate').value;
+  if(!date) return;
+  const map = getBlockedMap();
+  tempBlockedForDate = [...(map[date]||[])];
+  const grid = document.getElementById('blockTimesGrid');
+  grid.innerHTML = ALL_SLOTS.map(t=>{
+    const isBlocked = tempBlockedForDate.includes(t);
+    return `<span class="time-toggle ${isBlocked?'blocked':''}" onclick="toggleBlockTime('${t}',this)">${t}</span>`;
+  }).join('');
+  loadBlockedOverview();
+}
+
+function toggleBlockTime(t, el){
+  if(tempBlockedForDate.includes(t)){
+    tempBlockedForDate = tempBlockedForDate.filter(x=>x!==t);
+    el.classList.remove('blocked');
+  } else {
+    tempBlockedForDate.push(t);
+    el.classList.add('blocked');
+  }
+}
+
+function saveBlockedTimes(){
+  const date = document.getElementById('blockDate').value;
+  if(!date){alert('Pehle tarikh chunein');return}
+  const map = getBlockedMap();
+  map[date] = tempBlockedForDate;
+  saveBlockedMap(map);
+  loadBlockedOverview();
+  alert('✓ Blocked times save ho gaye!');
+}
+
+function loadBlockedOverview(){
+  const map = getBlockedMap();
+  const keys = Object.keys(map).filter(k=>map[k].length>0).sort();
+  if(keys.length===0){document.getElementById('blockedOverview').textContent='Koi blocked time nahi';return}
+  document.getElementById('blockedOverview').innerHTML = keys.map(d=>`<div style="margin-bottom:8px"><span style="color:#f7a0b8;margin-right:10px">${d}</span>${map[d].join(', ')}</div>`).join('');
+}
+
+// ======== MARQUEE ========
+const items=['Keratin Treatment','Hair Spa','Hair PRP','Hydra Facial','Skin PRP','Microneedling','Whitening Injection','Laser Hair Removal','Bridal Makeup','Party Makeup','Full Body Waxing','Glow Facial'];
+const m=document.getElementById('marqueeInner');
+let mi='';
+[...items,...items].forEach(it=>mi+=`<span class="marquee-item"><span class="marquee-dot"></span>${it}</span>`);
+m.innerHTML=mi+mi;
+
+// ======== CURSOR ========
+const curEl=document.getElementById('cursor');
+const ringEl=document.getElementById('cursorRing');
+document.addEventListener('mousemove',e=>{curEl.style.left=e.clientX-6+'px';curEl.style.top=e.clientY-6+'px';ringEl.style.left=e.clientX-18+'px';ringEl.style.top=e.clientY-18+'px'});
+document.querySelectorAll('button,a,.service-card').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{curEl.style.transform='scale(2)';ringEl.style.opacity='.3'});
+  el.addEventListener('mouseleave',()=>{curEl.style.transform='scale(1)';ringEl.style.opacity='.6'});
+});
+
+// ======== REVEAL ========
+function observeReveal(){
+  const obs=new IntersectionObserver(e=>e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('visible')}),{threshold:.12});
+  document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>obs.observe(el));
+}
+
+// ======== SCROLL TOP ========
+window.addEventListener('scroll',()=>document.getElementById('scrollTop').classList.toggle('visible',scrollY>400));
+
+// ======== PETALS ========
+const p=document.getElementById('particles');
+for(let i=0;i<18;i++){
+  const d=document.createElement('div');
+  d.className='petal';d.innerHTML='🌸';
+  d.style.cssText=`left:${Math.random()*100}%;font-size:${10+Math.random()*14}px;animation-duration:${8+Math.random()*12}s;animation-delay:${Math.random()*10}s;`;
+  p.appendChild(d);
+}
+
+// ======== DATE MIN ========
+document.getElementById('clientDate').min=new Date().toISOString().split('T')[0];
+const bd=document.getElementById('blockDate');
+if(bd) bd.min=new Date().toISOString().split('T')[0];
+
+// ======== INIT ========
+if(!localStorage.getItem('caviiServices')) saveServices(DEFAULT_SERVICES);
+renderServices();
+updateCartUI();
+</script>
+</body>
+</html>
